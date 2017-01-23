@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+ 
+{% block title %}测试genoverse{% endblock %}
+ 
+{% block content %}
+<div class="ui accordion">
+  <h1 class="ui header title">
+    <i class="dropdown icon"></i>
+    测试genoverse
+  </h1>
+  <div class="content">
+    <p>Genoverse is a portable, customizable, back-end independent JavaScript and HTML5 based genome browser which allows the user to explore data interactively.</p>
+    <p>Data is visualized in the browser, meaning Genoverse can be installed on any website and show data from a wide range of online or local sources.</p>
+    <p>Genoverse works with a variety of formats, such as XML, JSON, GFF, GFF3, BED (try drag-n-drop one), and can be customized to parse and display any data source as required.</p>
+    <p>For more information on how to use Genoverse please refer to <a href="http://wtsi-web.github.io/Genoverse/help.pdf">this tutorial</a>.</p>
+  </div>
+  <div class="ui inverted divider"></div>
+  <h1 class="ui header title">
+    <i class="dropdown icon"></i>
+    学习任务
+  </h1>
+  <div class="content">
+    <div class="ui ordered list">
+      <a class="item" href={% url 'genoverse_embed' %}>整合genoverse到网站</a>
+      <div class="item">
+        <a class="item" href={% url 'genoverse_add_tracker' %}>添加Tracker</a>
+        <div class="list">
+          <a class="item">CNV Tracker --> 完成</a>
+          <a class="item">DGV Tracker --> 完成</a>
+        </div>
+      </div>
+      <div class="item">
+        <a>Languages</a>
+        <div class="list">
+          <a class="item">HTML</a>
+          <a class="item">Javascript</a>
+          <a class="item">CSS</a>
+        </div>
+      </div>
+      <a class="item">Review</a>
+    </div>
+  </div>
+</div>
+<script>
+  $('.ui.accordion').accordion();
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+        <title>mysite - {% block title %}默认标题{% endblock %}</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/static/vendor/genoverse/js/genoverse.combined.js"></script>
+        <link rel="stylesheet" type="text/css" href="/static/vendor/semantic/semantic.min.css">
+        <script src="/static/vendor/semantic/semantic.min.js"></script>
+  </head>
+  <body>
+    {% include 'nav.html' %}
+
+    <div class="ui basic container" style="margin: 60px 0px 60px 0px"> 
+      {% block content %}
+      <div>这里是默认内容，所有继承自这个模板的，如果不覆盖就显示这里的默认内容。</div>
+      {% endblock %}
+    </div>
+
+    {% include 'bottom.html' %}
+  </body>
+</html>

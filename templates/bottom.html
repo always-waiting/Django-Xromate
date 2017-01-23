@@ -1,0 +1,25 @@
+<!--<div class="ui rail">
+  <div class="ui sticky">
+    结尾栏
+  </div>
+</div>
+<div id="bottom-context"></div>
+<script>
+$('.ui.sticky').sticky({
+  context: '#bottom-context',
+  bottomOffset : 1000,
+});
+</script>-->
+<script>
+  var $body = $('body');
+  var $container = $('.ui.basic.container');
+  if ($body.height() > $container.height()) {
+    $body.append(
+      '<div class="ui inverted footer segment" style="position:fixed;left:0;bottom:0;right:0">作者: 秘熙超</div>'
+    );    
+  } else {
+    $body.append(
+      '<div class="ui inverted footer segment">作者: 秘熙超</div>'
+    );
+  }
+</script>

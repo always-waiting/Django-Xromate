@@ -1,0 +1,22 @@
+<div class="ui top fixed blue inverted menu">
+  <a class="active item" href={% url 'homepage' %}>主页</a>
+  <div class="right menu">
+    <div class="ui dropdown item" id="study_list">
+      <a>学习</a>
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href={% url 'genoverse_index' %}>Genoverse</a>
+        <a class="item" href={% url 'annodb_index'%}>AnnoDB</a>
+        <a class="item">待定</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('.ui.dropdown').dropdown();
+  if (window.location.pathname.match('/genoverse/')) {
+    $('#study_list').children("a").first().text("Genoverse");
+  } else if (window.location.pathname.match('/annodb/')) {
+    $('#study_list').children("a").first().text("AnnoDB");
+  }
+</script>
