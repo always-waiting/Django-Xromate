@@ -14,14 +14,21 @@ def index(request):
     return render(request, 'annodb/home.html');
 
 def dgv(request):
+    """
+    按照坐标选取重合dgv变异.有如下规则:
+        1. dgv.start <= end
+        2. dgv.end >= start
+        3. dgv.mergedOrSample = S
+        4. dgv.chr = chr
+        5. limit = 20
+    在前端展示时,也有规则，具体规则见前段相应代码
+    """
     chrnum = request.GET['chr']
     chrnum = int(chrnum) if chrnum.isdigit() else chrnum
     start = request.GET['start']
     start = int(start)
     end = request.GET['end']
     end = int(end)
-    res = u"%s:%s--->%s在这里定义提出数据库DGV数据的方法" % (chrnum, start, end)
-    #res = u"在这里定义提出数据库DGV数据的方法"
     query = {
         'chr': chrnum,
         'start__lte': end,
@@ -29,8 +36,7 @@ def dgv(request):
         'mergedOrSample': 'S',
     }
     result = DgvVarient.objects(**query).limit(20)
-    #result = DgvVarient.objects(chr=10,start__lte=200000,end__gte=2000,mergedOrSample='S')
-    logger.error(result)
+    #logger.error(result)
     return JsonResponse(
         [ json.loads(item.to_json()) for item in result ],
         safe=False

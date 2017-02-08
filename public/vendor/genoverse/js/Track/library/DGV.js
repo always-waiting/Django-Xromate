@@ -20,6 +20,12 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
       f = d[a];
       //console.log(f)
       //console.log(this.browser)
+      /*
+      前段DGV展示规则:
+      1. dgv.end >= cnv.end
+      2. dgv.start <= cnv.start
+      3. cnv.gainloss = 'gain' --> dgv.observedGains > 0 or cnv.gainloss = 'loss' --> dgv.observedLosses > 0
+      */
       if (f.end >= this.browser.cnv.end && f.start <= this.browser.cnv.start && (
             this.browser.cnv.gainloss == 'gain' ? f.observedGains > 0 :
             this.browser.cnv.gainloss == 'loss' ? f.observedLosses > 0 : false)) {
