@@ -5,7 +5,7 @@ import os
 import textwrap
 import lib.OmimEntry
 import lib.DGV
-
+import lib.OmimGenemap
 """
 class Command(BaseCommand):
     help = ''
@@ -51,7 +51,9 @@ class Command(BaseCommand):
             u"处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
             u"""
             OMIM数据库的命令组
-            目前正在开发阶段，正在开发entry表的导入功能
+            目前正在开发阶段，过程如下
+            1.完成entry表的导入功能
+            2.开发genemap表的导入功能
             """
         )
         omim_parser = omim_cmds.add_subparsers(help="OMIM subtables")
@@ -60,13 +62,37 @@ class Command(BaseCommand):
             omim_parser, "entry",
             u"omim数据库entry表的命令组",
             u"""
-            处理omim_entrys表的各种动作
-            目前开发entry表的导入命令:import
+            处理omim_entry表的各种动作
+            目前完成了entry表的导入命令:import
             """
         )
         omim_entry_parser = omim_entry_cmds.add_subparsers(help="OMIM Entry table actions")
         # OMIM ENTRY import action
         self.omim_entry_parser_import(omim_entry_parser)
+
+        # OMIM -> genemap命令组
+        omim_genemap_cmds = self.cmds_add(
+            omim_parser, "genemap",
+            u"omim数据库genemap表的命令组",
+            u"""
+            处理omim_genemap表的各种动作
+            目录开发genemap表的导入命令:import
+            """
+        )
+        omim_genemap_parser = omim_genemap_cmds.add_subparsers(help="OMIM Genemap table actions")
+        # OMIM Genemap import action
+        self.omim_genemap_parser_import(omim_genemap_parser)
+
+    def omim_genemap_parser_import(self, parser):
+        genemap_import = parser.add_parser('import', help=u"""OMIM Genemap表的导入""",
+            description = textwrap.dedent(u"""
+            导入Genemap表。处理genemap.txt文件，导入文件内容
+            """)
+        )
+        genemap_import.add_argument("--input",'-i', type=str, help="Input file ususally is genemap.txt", required=True)
+        genemap_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        genemap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        genemap_import.set_defaults(func=lib.OmimGenemap.omim_genemap_import)
 
     def dgv_parser_import(self, parser):
         dgv_import = parser.add_parser('import',
@@ -76,12 +102,12 @@ class Command(BaseCommand):
             把DGV数据库的信息导入到Mongo.导入时有如下规则:
             1. 导入的信息是GRCh37_hg19_supportingvariants_version.txt文件中内容
             2. 导入的变异要求长度大于min_length(default: 100000)
-            """
-            )
+            """)
         )
         dgv_import.add_argument('--input', '-i', type=str, help='Input file such as GRCh37_hg19_supportingvariants_2016-05-15.txt', required=True)
         dgv_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
         dgv_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        # 未来删除这个选项，把表的名字都固定下来。dgv_varient
         dgv_import.add_argument('--collection', '-c', type=str, help="Collection used for mongo suce as dgv_test", default='dgv_test')
         dgv_import.add_argument('--workers', '-w', type=int, help="Number of concurrent workers to insert", default=4)
         dgv_import.add_argument('--min_length', '-m', type=int, help="Min length of variants", default=100000)
@@ -98,13 +124,11 @@ class Command(BaseCommand):
             help=u"""OMIM Entry表的导入""",
             description = textwrap.dedent(u"""
             导入Entry表。处理omim.txt文件，导入文件内容
-            """
-            )
+            """)
         )
         entry_import.add_argument('--input', '-i', type=str, help="Input file usually is omim.txt", required=True)
-        entry_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        entry_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="mongodb://localhost:27017")
         entry_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
-        entry_import.add_argument('--collection', '-c', type=str, help="Collection used for mongo suce as entry_test", default='entry_test')
         entry_import.set_defaults(func=lib.OmimEntry.omim_entry_import)
 
     def FUN(self, **options):

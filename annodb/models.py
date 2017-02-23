@@ -5,6 +5,7 @@ from django.db import models
 import mongoengine as mongoe
 from lib.OmimEntry import OmimEntry
 from lib.DgvVarient import DgvVarient
+from lib.OmimGenemap import OmimGenemap
 from apps import AnnodbConfig
 # Create your models here.
 
