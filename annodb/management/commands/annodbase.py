@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('poll_id', nargs='+', type=int)
 
     def handle(self, *args, **options):
-        self.stdout.write(u"这是一个测试")
+        self.stdout.write("这是一个测试")
 """
 class Command(BaseCommand):
 
@@ -39,8 +39,8 @@ class Command(BaseCommand):
         # DGV命令组
         dgv_cmds = self.cmds_add(
             subparsers, 'dgv',
-            u"处理DGV数据库",
-            u"""处理DGV数据库,目前只有import功能"""
+            "处理DGV数据库",
+            """处理DGV数据库,目前只有import功能"""
         )
         dgv_parser = dgv_cmds.add_subparsers(help="DGV commands")
         # DGV import action
@@ -48,8 +48,8 @@ class Command(BaseCommand):
         # OMIM数据库命令组
         omim_cmds = self.cmds_add(
             subparsers, "omim",
-            u"处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
-            u"""
+            "处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
+            """
             OMIM数据库的命令组
             目前正在开发阶段，过程如下
             1.完成entry表的导入功能
@@ -60,8 +60,8 @@ class Command(BaseCommand):
         # OMIM -> ENTRY命令组
         omim_entry_cmds = self.cmds_add(
             omim_parser, "entry",
-            u"omim数据库entry表的命令组",
-            u"""
+            "omim数据库entry表的命令组",
+            """
             处理omim_entry表的各种动作
             目前完成了entry表的导入命令:import
             """
@@ -73,8 +73,8 @@ class Command(BaseCommand):
         # OMIM -> genemap命令组
         omim_genemap_cmds = self.cmds_add(
             omim_parser, "genemap",
-            u"omim数据库genemap表的命令组",
-            u"""
+            "omim数据库genemap表的命令组",
+            """
             处理omim_genemap表的各种动作
             目录开发genemap表的导入命令:import
             """
@@ -82,10 +82,25 @@ class Command(BaseCommand):
         omim_genemap_parser = omim_genemap_cmds.add_subparsers(help="OMIM Genemap table actions")
         # OMIM Genemap import action
         self.omim_genemap_parser_import(omim_genemap_parser)
+        # OMIM Genemap update OMIM Entry action
+        self.omim_genemap_parser_update_entry(omim_genemap_parser)
+
+    def omim_genemap_parser_update_entry(self, parser):
+        genemap_update_entry = parser.add_parser("update_entry", help="""从omim_genemap中获得信息更新到omim_entry""",
+            description = textwrap.dedent("""
+            通过mimNumber，从omim_genemap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            """)
+        )
+        genemap_update_entry.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
+        genemap_update_entry.add_argument("--genemaphost", "-gh", type=str, help="Host for omim_genemap", default="mongodb://localhost:27017")
+        genemap_update_entry.add_argument("--genemapdb", "-gdb", type=str, help="db name for omim_genemap", default="dbtest")
+        genemap_update_entry.add_argument("--entryhost", '-eh', type=str, help="Host for omim_entry", default="mongodb://localhost:27017")
+        genemap_update_entry.add_argument("--entrydb", '-edb', type=str, help="db name for omim_entry", default="dbtest")
+        genemap_update_entry.set_defaults(func=lib.OmimGenemap.omim_genemap_update_entry)
 
     def omim_genemap_parser_import(self, parser):
-        genemap_import = parser.add_parser('import', help=u"""OMIM Genemap表的导入""",
-            description = textwrap.dedent(u"""
+        genemap_import = parser.add_parser('import', help="""OMIM Genemap表的导入""",
+            description = textwrap.dedent("""
             导入Genemap表。处理genemap.txt文件，导入文件内容
             """)
         )
@@ -98,7 +113,7 @@ class Command(BaseCommand):
         dgv_import = parser.add_parser('import',
             formatter_class=RawDescriptionHelpFormatter,
             help='Import GRCh37_hg19_supportingvariants_version.txt into mongodb',
-            description = textwrap.dedent(u"""
+            description = textwrap.dedent("""
             把DGV数据库的信息导入到Mongo.导入时有如下规则:
             1. 导入的信息是GRCh37_hg19_supportingvariants_version.txt文件中内容
             2. 导入的变异要求长度大于min_length(default: 100000)
@@ -121,8 +136,8 @@ class Command(BaseCommand):
 
     def omim_entry_parser_import(self, parser):
         entry_import = parser.add_parser('import',
-            help=u"""OMIM Entry表的导入""",
-            description = textwrap.dedent(u"""
+            help="""OMIM Entry表的导入""",
+            description = textwrap.dedent("""
             导入Entry表。处理omim.txt文件，导入文件内容
             """)
         )

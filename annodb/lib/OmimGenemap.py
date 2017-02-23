@@ -29,7 +29,8 @@ class OmimGenemap(mongoe.Document):
     #geneName = mongoe.StringField()# 这个属性应该没有用处
     mappingMethod = mongoe.StringField()
     #confidence = mongoe.StringField(max_length=3, choices=('P', 'L'))# perl中为L应该是错误
-    confidence = mongoe.StringField(max_length=3, choices=('P', 'C'))
+    #confidence = mongoe.StringField(max_length=3, choices=('P', 'C'))
+    confidence = mongoe.StringField()
     geneInheritance = mongoe.StringField()
     phenotypeMapList = mongoe.ListField(mongoe.DictField())
     # 以下是perl中没有的
