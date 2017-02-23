@@ -6,6 +6,7 @@ import textwrap
 import lib.OmimEntry
 import lib.DGV
 import lib.OmimGenemap
+import lib.OmimMorbidmap
 """
 class Command(BaseCommand):
     help = ''
@@ -19,9 +20,9 @@ class Command(BaseCommand):
 """
 class Command(BaseCommand):
 
-    help = "Annodbase commands group"
+    help = u"Annodbase commands group"
 
-    def cmds_add(self, parser, cmds, hinfo="Help info", des="Description"):
+    def cmds_add(self, parser, cmds, hinfo=u"Help info", des=u"Description"):
         cmds = parser.add_parser(
             cmds, formatter_class=RawDescriptionHelpFormatter,
             help=hinfo, description = textwrap.dedent(des)
@@ -35,59 +36,83 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         #　子命令组
-        subparsers = parser.add_subparsers(help='sub-command help', parser_class=type(ArgumentParser()))
+        subparsers = parser.add_subparsers(help=u'sub-command help', parser_class=type(ArgumentParser()))
         # DGV命令组
         dgv_cmds = self.cmds_add(
             subparsers, 'dgv',
-            "处理DGV数据库",
-            """处理DGV数据库,目前只有import功能"""
+            u"处理DGV数据库",
+            u"""处理DGV数据库,目前只有import功能"""
         )
-        dgv_parser = dgv_cmds.add_subparsers(help="DGV commands")
+        dgv_parser = dgv_cmds.add_subparsers(help=u"DGV commands")
         # DGV import action
         self.dgv_parser_import(dgv_parser)
         # OMIM数据库命令组
         omim_cmds = self.cmds_add(
             subparsers, "omim",
-            "处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
-            """
+            u"处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
+            u"""
             OMIM数据库的命令组
             目前正在开发阶段，过程如下
             1.完成entry表的导入功能
             2.开发genemap表的导入功能
             """
         )
-        omim_parser = omim_cmds.add_subparsers(help="OMIM subtables")
+        omim_parser = omim_cmds.add_subparsers(help=u"OMIM subtables")
         # OMIM -> ENTRY命令组
         omim_entry_cmds = self.cmds_add(
             omim_parser, "entry",
-            "omim数据库entry表的命令组",
-            """
+            u"omim数据库entry表的命令组",
+            u"""
             处理omim_entry表的各种动作
             目前完成了entry表的导入命令:import
             """
         )
-        omim_entry_parser = omim_entry_cmds.add_subparsers(help="OMIM Entry table actions")
+        omim_entry_parser = omim_entry_cmds.add_subparsers(help=u"OMIM Entry table actions")
         # OMIM ENTRY import action
         self.omim_entry_parser_import(omim_entry_parser)
 
         # OMIM -> genemap命令组
         omim_genemap_cmds = self.cmds_add(
             omim_parser, "genemap",
-            "omim数据库genemap表的命令组",
-            """
+            u"omim数据库genemap表的命令组",
+            u"""
             处理omim_genemap表的各种动作
             目录开发genemap表的导入命令:import
             """
         )
-        omim_genemap_parser = omim_genemap_cmds.add_subparsers(help="OMIM Genemap table actions")
+        omim_genemap_parser = omim_genemap_cmds.add_subparsers(help=u"OMIM Genemap table actions")
         # OMIM Genemap import action
         self.omim_genemap_parser_import(omim_genemap_parser)
         # OMIM Genemap update OMIM Entry action
         self.omim_genemap_parser_update_entry(omim_genemap_parser)
 
+        # OMIM -> morbidmap命令组
+        omim_morbidmap_cmds = self.cmds_add(
+            omim_parser, "morbidmap",
+            u"omim数据库morbidmap表的命令组",
+            u"""
+            处理omim_morbidmap表的各种动作
+            目前开发morbidmap表的导入命令:import
+            """
+        )
+        omim_morbidmap_parser = omim_morbidmap_cmds.add_subparsers(help=u"Omim Morbidmap table actions")
+        ## Omim Morbidmap import action
+        self.omim_morbidmap_parser_import(omim_morbidmap_parser)
+
+    def omim_morbidmap_parser_import(self, parser):
+        morbidmap_import = parser.add_parser("import", help=u"OMIM Morbidmap表的导入",
+            description = textwrap.dedent(u"""
+            导入Morbidmap表。处理morbidmap.txt文件，导入文件内容
+            """)
+        )
+        morbidmap_import.add_argument("--input","-i", type=str, help="Input file ususally is morbidmap.txt", required=True)
+        morbidmap_import.add_argument("--host",'-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        morbidmap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        morbidmap_import.set_defaults(func=lib.OmimMorbidmap.omim_morbidmap_import)
+
     def omim_genemap_parser_update_entry(self, parser):
-        genemap_update_entry = parser.add_parser("update_entry", help="""从omim_genemap中获得信息更新到omim_entry""",
-            description = textwrap.dedent("""
+        genemap_update_entry = parser.add_parser("update_entry", help=u"""从omim_genemap中获得信息更新到omim_entry""",
+            description = textwrap.dedent(u"""
             通过mimNumber，从omim_genemap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
             """)
         )
@@ -99,8 +124,8 @@ class Command(BaseCommand):
         genemap_update_entry.set_defaults(func=lib.OmimGenemap.omim_genemap_update_entry)
 
     def omim_genemap_parser_import(self, parser):
-        genemap_import = parser.add_parser('import', help="""OMIM Genemap表的导入""",
-            description = textwrap.dedent("""
+        genemap_import = parser.add_parser('import', help=u"""OMIM Genemap表的导入""",
+            description = textwrap.dedent(u"""
             导入Genemap表。处理genemap.txt文件，导入文件内容
             """)
         )
@@ -113,7 +138,7 @@ class Command(BaseCommand):
         dgv_import = parser.add_parser('import',
             formatter_class=RawDescriptionHelpFormatter,
             help='Import GRCh37_hg19_supportingvariants_version.txt into mongodb',
-            description = textwrap.dedent("""
+            description = textwrap.dedent(u"""
             把DGV数据库的信息导入到Mongo.导入时有如下规则:
             1. 导入的信息是GRCh37_hg19_supportingvariants_version.txt文件中内容
             2. 导入的变异要求长度大于min_length(default: 100000)
@@ -136,8 +161,8 @@ class Command(BaseCommand):
 
     def omim_entry_parser_import(self, parser):
         entry_import = parser.add_parser('import',
-            help="""OMIM Entry表的导入""",
-            description = textwrap.dedent("""
+            help=u"""OMIM Entry表的导入""",
+            description = textwrap.dedent(u"""
             导入Entry表。处理omim.txt文件，导入文件内容
             """)
         )
