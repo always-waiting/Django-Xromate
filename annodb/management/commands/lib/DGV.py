@@ -5,6 +5,7 @@ import os
 def dgv_import(self,**options):
     u"""
     DGV数据库的导入命令
+    self是annodb.management.commands.annodbase.Command
     """
     cmd = "awk '{if (($4 - $3) >= %d) {print $0}}'" % options['min_length']
 

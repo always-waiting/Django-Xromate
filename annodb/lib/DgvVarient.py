@@ -5,12 +5,14 @@
 from __future__ import unicode_literals
 from django.db import models
 import mongoengine as mongoe
-
+from annodb.apps import AnnodbConfig
 
 class DgvVarient(mongoe.Document):
     """
     collection name: dgv_varient
     """
+    meta = {'db_alias': AnnodbConfig.alias}
+
     variantAccession = mongoe.StringField(required=True)
     chr = mongoe.StringField()
     method = mongoe.StringField()

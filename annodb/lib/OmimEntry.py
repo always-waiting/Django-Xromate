@@ -6,11 +6,15 @@ from __future__ import unicode_literals
 from django.db import models
 import mongoengine as mongoe
 import re
+from annodb.apps import AnnodbConfig
 
 class OmimEntry(mongoe.Document):
     """
     collection name: omim_entry
     """
+    #meta = {'db_alias': DATABASES['annodb']['alias']}
+    meta = {'db_alias': AnnodbConfig.alias}
+
     prefix_choices = ('*', '+', '#', '%', '^', '','1','2','3','4','5','6')
     prefix = mongoe.StringField(max_length=3, choices=prefix_choices)
     mimNumber = mongoe.IntField()

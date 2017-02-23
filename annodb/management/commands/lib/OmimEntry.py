@@ -3,7 +3,10 @@ import os
 import StringIO
 import re
 import annodb.models as dbmodels
+import mongoengine
 
+#print "2"*60
+#dbmodels.dbconnection('test', 'mongodb://192.168.4.13:27017')
 def test():
     print u"这时一个测试，用于判断是否成功加载"
 
@@ -15,6 +18,12 @@ def omim_entry_import(cmdobj, **options):
     # 检查文件是否存在
     if not os.path.exists(options['input']):
         raise Exception(options['input'] + " not exists");
+    # 检查能否链接数据库
+    try:
+        #print "0"*60
+        mongoengine.register_connection("cmd-omimentry-import", options['db'], options['host'])
+    except:
+        raise Exception(u"链接数据库" + options['host'] + "/" + options['db']+ u"失败")
     # 开发文件解析函数
     with open(options['input']) as f:
         for chunk in myreadlines(f, '*RECORD*'):
@@ -38,16 +47,17 @@ def omim_entry_import(cmdobj, **options):
 
 
 def import_omim_entry(record):
-    try:
-        entry = dbmodels.OmimEntry.objects.get(mimNumber = record['mimNumber'])
-    except dbmodels.OmimEntry.DoesNotExist:
-        # 插入样本
-        entry = dbmodels.OmimEntry(**record)
-        entry.save()
-    except dbmodels.OmimEntry.MultipleObjectsReturned:
-        raise Exception(record['mimNumber'] + u"有多条记录，需要人工核查!")
-    except:
-        raise Exception(u"在数据库查询"+record['mimNumber']+u'时出现位置错误')
+    with mongoengine.context_managers.switch_db(dbmodels.OmimEntry, "cmd-omimentry-import") as dbmodels.OmimEntry:
+        try:
+            entry = dbmodels.OmimEntry.objects.get(mimNumber = record['mimNumber'])
+        except dbmodels.OmimEntry.DoesNotExist:
+            # 插入样本
+            entry = dbmodels.OmimEntry(**record)
+            entry.save()
+        except dbmodels.OmimEntry.MultipleObjectsReturned:
+            raise Exception(u"有多条记录，需要人工核查!")
+        except:
+            raise Exception(u"在数据库查询时出现未知错误")
 
 
 def parser_omim_item(chunk):

@@ -5,8 +5,29 @@ from django.db import models
 import mongoengine as mongoe
 from lib.OmimEntry import OmimEntry
 from lib.DgvVarient import DgvVarient
-from mysite.settings import DATABASES
+from apps import AnnodbConfig
 # Create your models here.
 
-mongoe.connect(DATABASES['annodb']['NAME'])
+'''
+from mysite.settings import DATABASES
+mongoe.connect(
+    DATABASES['annodb']['NAME'],
+    host=DATABASES['annodb']['HOST'],
+    alias=DATABASES['annodb']['alias']
+)
+'''
+mongoe.connect(
+    AnnodbConfig.db,
+    host=AnnodbConfig.host,
+    alias=AnnodbConfig.alias
+)
+
+def dbconnection(dbname, host='mongodb://localhost:27017', alias='annodb'):
+    """
+    这个函数已经可以删除了，没有用处了
+    """
+    try:
+        mongoe.connect(dbname, host=host, alias=alias)
+    except:
+        raise Exception(u"数据库链接失败")
 
