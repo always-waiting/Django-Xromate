@@ -6,6 +6,7 @@ import mongoengine as mongoe
 from lib.OmimEntry import OmimEntry
 from lib.DgvVarient import DgvVarient
 from lib.OmimGenemap import OmimGenemap
+from lib.OmimMorbidmap import OmimMorbidmap
 from apps import AnnodbConfig
 # Create your models here.
 
