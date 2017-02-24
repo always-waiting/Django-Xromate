@@ -98,6 +98,52 @@ class Command(BaseCommand):
         omim_morbidmap_parser = omim_morbidmap_cmds.add_subparsers(help=u"Omim Morbidmap table actions")
         ## Omim Morbidmap import action
         self.omim_morbidmap_parser_import(omim_morbidmap_parser)
+        ## OMIM Morbidmap update OMIM Genemap action
+        self.omim_morbidmap_parser_update_genemap(omim_morbidmap_parser)
+        ## OMIM Morbidmap update OMIM Entry action
+        self.omim_morbidmap_parser_update_entry(omim_morbidmap_parser)
+
+
+    """
+    以下是调用的方法
+    """
+    def omim_morbidmap_parser_update_entry(self, parser):
+        morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
+            description = textwrap.dedent(u"""
+            通过mimNumber，从omim_morbidmap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            """)
+        )
+        morbidmap_update_entry.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
+        morbidmap_update_entry.add_argument("--entryhost","-eh", type=str, help="Host for omim_entry", default="mongodb://localhost:27017")
+        morbidmap_update_entry.add_argument("--entrydb", "-edb", type=str, help="db name for omim_entry", default="dbtest")
+        morbidmap_update_entry.add_argument("--morbidmaphost", "-mh", type=str, help="Host for omim_morbidmap", default="mongodb://localhost:27017")
+        morbidmap_update_entry.add_argument("--morbidmapdb", "-mdb", type=str, help="db name for omim_morbidmap", default="dbtest")
+        morbidmap_update_entry.set_defaults(func=lib.OmimMorbidmap.update_entry)
+
+    def omim_morbidmap_parser_import(self, parser):
+        morbidmap_import = parser.add_parser("import", help=u"OMIM Morbidmap表的导入",
+            description = textwrap.dedent(u"""
+            导入Morbidmap表。处理morbidmap.txt文件，导入文件内容
+            """)
+        )
+        morbidmap_import.add_argument("--input","-i", type=str, help="Input file ususally is morbidmap.txt", required=True)
+        morbidmap_import.add_argument("--host",'-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        morbidmap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        morbidmap_import.set_defaults(func=lib.OmimMorbidmap.omim_morbidmap_import)
+
+
+    def omim_morbidmap_parser_update_genemap(self, parser):
+        morbidmap_update_genemap = parser.add_parser("update_genemap", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
+            description = textwrap.dedent(u"""
+            通过mimNumber，从omim_morbidmap中获得信息更新到omim_genemap。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            """)
+        )
+        morbidmap_update_genemap.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
+        morbidmap_update_genemap.add_argument("--genemaphost","-gh", type=str, help="Host for omim_genemap", default="mongodb://localhost:27017")
+        morbidmap_update_genemap.add_argument("--genemapdb", "-gdb", type=str, help="db name for omim_genemap", default="dbtest")
+        morbidmap_update_genemap.add_argument("--morbidmaphost", "-mh", type=str, help="Host for omim_morbidmap", default="mongodb://localhost:27017")
+        morbidmap_update_genemap.add_argument("--morbidmapdb", "-mdb", type=str, help="db name for omim_morbidmap", default="dbtest")
+        morbidmap_update_genemap.set_defaults(func=lib.OmimMorbidmap.update_genemap)
 
     def omim_morbidmap_parser_import(self, parser):
         morbidmap_import = parser.add_parser("import", help=u"OMIM Morbidmap表的导入",

@@ -9,6 +9,7 @@ from annodb.apps import AnnodbConfig, dumpstring
 class OmimMorbidmap(mongoe.Document):
     """
     collection name: omim_morbidmap
+    chr, start, ent由cytoband表更新获得，这个以后处理
     """
     meta = {'db_alias': AnnodbConfig.alias}
 
