@@ -85,7 +85,8 @@ class Command(BaseCommand):
         self.omim_genemap_parser_import(omim_genemap_parser)
         # OMIM Genemap update OMIM Entry action
         self.omim_genemap_parser_update_entry(omim_genemap_parser)
-
+        # OMIM Genemap mim2gene_update action
+        self.omim_genemap_parser_mim2gene_update(omim_genemap_parser)
         # OMIM -> morbidmap命令组
         omim_morbidmap_cmds = self.cmds_add(
             omim_parser, "morbidmap",
@@ -107,6 +108,18 @@ class Command(BaseCommand):
     """
     以下是调用的方法
     """
+    def omim_genemap_parser_mim2gene_update(self, parser):
+        mim2gene_update_genemap = parser.add_parser("mim2gene_update", help=u"从输入文件中获得信息，导入到genemap表中",
+            description = textwrap.dedent(u"""
+            从mim2gene.txt和refFlat.txt文件获得信息，更新表genemap
+            """)
+        )
+        mim2gene_update_genemap.add_argument("--input", "-i", type=str, help="mim2gene.txt file", required = True)
+        mim2gene_update_genemap.add_argument("--refflat", "-r", type=str, help="refFlat.txt file", required = True)
+        mim2gene_update_genemap.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        mim2gene_update_genemap.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        mim2gene_update_genemap.set_defaults(func=lib.OmimGenemap.mim2gene_update)
+
     def omim_morbidmap_parser_update_entry(self, parser):
         morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
             description = textwrap.dedent(u"""

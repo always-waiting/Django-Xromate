@@ -19,8 +19,12 @@ class OmimGenemap(mongoe.Document):
     chromosome = mongoe.IntField()
     chromosomeSymbol = mongoe.StringField()
     #chromosomeSort = mongoe.IntField()# 这个属性应该没有用处
+    # mim2gene_update处理
+    approvedGeneSymbol = mongoe.StringField()
+    chromosomeLocationStrand = mongoe.StringField()
     chromosomeLocationStart = mongoe.IntField()
     chromosomeLocationEnd = mongoe.IntField()
+    # done
     #transcript = mongoe.StringField()# 这个属性应该没有用处
     cytoLocation = mongoe.StringField()
     #computedCytoLocation = mongoe.StringField() # 这个属性应该没有用处

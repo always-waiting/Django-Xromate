@@ -2,12 +2,67 @@
 import os
 import re
 import annodb.models as dbmodels
+import annodb.lib.parser as parser
 #from annodb.models import OmimGenemap,OmimEntry
 from mongoengine import register_connection
 from mongoengine.context_managers import switch_db
 #import mongoengine
 from contextlib import nested
 import json
+
+def mim2gene_update(cmdobj, **opt):
+    """
+    通过mim2gene.txt和refFlat.txt文件更新Genemap表
+    """
+    #print "开发阶段";
+    # 检查文件
+    if not os.path.exists(opt['input']):
+        raise Exception(opt['input'] + " not exists")
+    if not os.path.exists(opt['refflat']):
+        raise Exception(opt['refflat'] + " not exists")
+    try:
+        register_connection("cmd-mim2gene_update", opt['db'], opt['host'])
+    except:
+        raise Exception("数据库链接失败")
+    # 解析refFlat
+    gene = parser.parse_refflat(opt['refflat'])
+    symbolist = list(map(str,range(1,23)))
+    symbolist.extend(['X','Y'])
+    symbol2chr = dict(zip(symbolist, list(range(1,25))))
+    with switch_db(dbmodels.OmimGenemap,'cmd-mim2gene_update') as OmimGenemap:
+        with open(opt['input']) as f:
+            for line in f:
+                line = line.lstrip().rstrip()
+                if not line: continue
+                if line.startswith("#"): continue
+                record = parser.parse_mim2gene(line);
+                #print record
+                if record['approvedGeneSymbol']:
+                    symbol = record['approvedGeneSymbol']
+                else:
+                    print "OMIM", record['mimNumber'],"is",record['type']
+                    continue
+                if not gene.has_key(symbol): continue
+                changes = {
+                    "approvedGeneSymbol": symbol,
+                    'chromosome': symbol2chr[gene[symbol]['chr']],
+                    'chromosomeSymbol': gene[symbol]['chr'],
+                    'chromosomeLocationStart': gene[symbol]['start'],
+                    'chromosomeLocationEnd': gene[symbol]['end'],
+                    'chromosomeLocationStrand': gene[symbol]['strand']
+                }
+                #print changes
+                mim = record['mimNumber']
+                try:
+                    genemap = OmimGenemap.objects.get(mimNumber = int(mim))
+                except OmimGenemap.DoesNotExist:
+                    print "在",opt['host'],"/",opt['db'],"/omim_genemap中没有",mim
+                    continue
+                except OmimGenemap.MultipleObjectsReturned:
+                    print "在",opt['host'],"/",opt['db'],"/omim_genemap中有多个",mim
+                    continue
+                genemap.update(**changes)
+                genemap.save()
 
 def omim_genemap_update_entry(cmdobj, **options):
     '''
