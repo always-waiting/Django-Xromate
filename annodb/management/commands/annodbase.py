@@ -121,7 +121,7 @@ class Command(BaseCommand):
         mim2gene_update_genemap.set_defaults(func=lib.OmimGenemap.mim2gene_update)
 
     def omim_morbidmap_parser_update_entry(self, parser):
-        morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
+        morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_entry",
             description = textwrap.dedent(u"""
             通过mimNumber，从omim_morbidmap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
             """)
