@@ -113,7 +113,7 @@ class Command(BaseCommand):
     def omim_entry_download(self, parser):
         entry_download = parser.add_parser("download", help=u"从网上下载必要的信息到entry表中",
             description = textwrap.dedent(u"""
-                通过给出mim或mim列表,从http://api.omim.org/api/entry下载必要的信息到entry表
+                通过给出mim或mim列表,从http://api.omim.org/api/entry 下载必要的信息到entry表
             """)
         )
         mim_group = entry_download.add_mutually_exclusive_group(required=True)
@@ -128,7 +128,9 @@ class Command(BaseCommand):
     def omim_genemap_parser_mim2gene_update(self, parser):
         mim2gene_update_genemap = parser.add_parser("mim2gene_update", help=u"从输入文件中获得信息，导入到genemap表中",
             description = textwrap.dedent(u"""
-            从mim2gene.txt和refFlat.txt文件获得信息，更新表genemap
+            从mim2gene.txt和refFlat.txt文件获得信息，更新表genemap的染色体坐标信息。字段有:
+            approvedGeneSymbol，chromosome，chromosomeSymbol，
+            chromosomeLocationStart，chromosomeLocationEnd，chromosomeLocationStrand，
             """)
         )
         mim2gene_update_genemap.add_argument("--input", "-i", type=str, help="mim2gene.txt file", required = True)
@@ -140,7 +142,7 @@ class Command(BaseCommand):
     def omim_morbidmap_parser_update_entry(self, parser):
         morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_entry",
             description = textwrap.dedent(u"""
-            通过mimNumber，从omim_morbidmap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            通过mimNumber，从omim_morbidmap中获得信息更新到omim_entry的phenotypeMapList字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
             """)
         )
         morbidmap_update_entry.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
@@ -165,7 +167,7 @@ class Command(BaseCommand):
     def omim_morbidmap_parser_update_genemap(self, parser):
         morbidmap_update_genemap = parser.add_parser("update_genemap", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
             description = textwrap.dedent(u"""
-            通过mimNumber，从omim_morbidmap中获得信息更新到omim_genemap。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            通过mimNumber，从omim_morbidmap中获得信息更新到omim_genemap的phenotypeMapList字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
             """)
         )
         morbidmap_update_genemap.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
@@ -189,7 +191,7 @@ class Command(BaseCommand):
     def omim_genemap_parser_update_entry(self, parser):
         genemap_update_entry = parser.add_parser("update_entry", help=u"""从omim_genemap中获得信息更新到omim_entry""",
             description = textwrap.dedent(u"""
-            通过mimNumber，从omim_genemap中获得信息更新到omim_entry。如果没给出mimNumber,则全部更新。mimNumber用空格分开
+            通过mimNumber，从omim_genemap中获得信息更新到omim_entry的geneMap字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
             """)
         )
         genemap_update_entry.add_argument("--mimNumber", "-mim", type=str, nargs='*', help="mimNumber need to update. If not given, all mimNumber will be updated. Different mimNumber split with blackspace")
