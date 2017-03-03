@@ -70,6 +70,8 @@ class Command(BaseCommand):
         omim_entry_parser = omim_entry_cmds.add_subparsers(help=u"OMIM Entry table actions")
         # OMIM ENTRY import action
         self.omim_entry_parser_import(omim_entry_parser)
+        # OMIM ENTRY download action
+        self.omim_entry_download(omim_entry_parser)
 
         # OMIM -> genemap命令组
         omim_genemap_cmds = self.cmds_add(
@@ -108,6 +110,21 @@ class Command(BaseCommand):
     """
     以下是调用的方法
     """
+    def omim_entry_download(self, parser):
+        entry_download = parser.add_parser("download", help=u"从网上下载必要的信息到entry表中",
+            description = textwrap.dedent(u"""
+                通过给出mim或mim列表,从http://api.omim.org/api/entry下载必要的信息到entry表
+            """)
+        )
+        mim_group = entry_download.add_mutually_exclusive_group(required=True)
+        mim_group.add_argument("--input","-i", help=u"用于下载的mim列表，只需要第一列为mimNumber即可")
+        mim_group.add_argument("--mimNumber","-mim", type=int, nargs='*', help=u"输入特定的mim下载，可以输入多个")
+        entry_download.add_argument("--clean","-c", action="store_true", help=u"True时删除表中相应数据后再下载跟新，False时直接下载，只更新相应内容")
+        entry_download.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
+        entry_download.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        entry_download.add_argument('--apikey','-a', type=str, help=u"OMIM网站的apikey,有默认值，但是需要定期更新", default="BK2V39hOQKibVY_Gud_bVQ")
+        entry_download.set_defaults(func=lib.OmimEntry.download)
+
     def omim_genemap_parser_mim2gene_update(self, parser):
         mim2gene_update_genemap = parser.add_parser("mim2gene_update", help=u"从输入文件中获得信息，导入到genemap表中",
             description = textwrap.dedent(u"""

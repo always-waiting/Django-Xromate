@@ -133,6 +133,24 @@ class ParseMorbidmap(object):
             print chunk
 
 
+class ParseEntryDownload(object):
+    """
+    输入文件第一列为需要下载的mimNumber
+    """
+    def __init__(self, filepath):
+        self.mims = []
+        if not os.path.exists(filepath): raise Exception(filepath + " not exists")
+        self.parse_entry_downloadlist(filepath)
+
+    def parse_entry_downloadlist(self, filepath):
+        with open(filepath) as f:
+            for line in f:
+                items = line.rstrip().lstrip().split()
+                if re.match("\d{6}", items[0]):
+                    self.mims.append(int(items[0]))
+
+
+
 class ParseEntry(object):
     """
     解析omim.txt文件的一条记录以**RECORD**作为分割
