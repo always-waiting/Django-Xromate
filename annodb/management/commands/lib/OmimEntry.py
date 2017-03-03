@@ -12,7 +12,7 @@ from mongoengine.context_managers import switch_db
 def test():
     print u"这时一个测试，用于判断是否成功加载"
 
-def omim_entry_import(cmdobj, **options):
+def importdb(cmdobj, **options):
     u"""
     导入omim.txt到数据库
     """
@@ -30,10 +30,10 @@ def omim_entry_import(cmdobj, **options):
             if chunk.find("*THEEND*") != -1: break
             #if chunk.find('104760') != -1:
             entryone = parser.ParseEntry(chunk);
-            import_omim_entry(entryone.record)
+            import_one(entryone.record)
 
 
-def import_omim_entry(record):
+def import_one(record):
     with switch_db(dbmodels.OmimEntry, "cmd-omimentry-import") as OmimEntry:
         try:
             entry = OmimEntry.objects.get(mimNumber = record['mimNumber'])

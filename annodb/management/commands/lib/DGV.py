@@ -2,7 +2,7 @@
 import os
 
 
-def dgv_import(self,**options):
+def importdb(self,**options):
     u"""
     DGV数据库的导入命令
     self是annodb.management.commands.annodbase.Command

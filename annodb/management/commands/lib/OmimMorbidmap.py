@@ -77,7 +77,7 @@ def update_genemap(cmdobj, **opt):
 
 
 
-def omim_morbidmap_import(cmdobj, **options):
+def importdb(cmdobj, **options):
     """
     导入morbidmap.txt到数据库
     """
@@ -96,9 +96,9 @@ def omim_morbidmap_import(cmdobj, **options):
             if chunk.startswith("#"): continue
             if not chunk: continue
             morbidmapone = parser.ParseMorbidmap(chunk)
-            import_omim_morbidmap(morbidmapone.record)
+            import_one(morbidmapone.record)
 
-def import_omim_morbidmap(record):
+def import_one(record):
     with switch_db(dbmodels.OmimMorbidmap, "cmd-import") as OmimMorbidmap:
         try:
             item = OmimMorbidmap(**record)

@@ -51,7 +51,7 @@ def mim2gene_update(cmdobj, **opt):
                 genemap.update(**changes)
                 genemap.save()
 
-def omim_genemap_update_entry(cmdobj, **options):
+def update_entry(cmdobj, **options):
     '''
     通过mimNumber把omim_genemap的信息更新到omim_entry
     '''
@@ -91,7 +91,7 @@ def omim_genemap_update_entry(cmdobj, **options):
                     print "".join(["在omim_entry中查询",str(genemap.mimNumber),"有多个"])
                     continue
 
-def omim_genemap_import(cmdobj, **options):
+def importdb(cmdobj, **options):
     """
     导入genemap.txt到数据库
     """
@@ -107,9 +107,9 @@ def omim_genemap_import(cmdobj, **options):
             if chunk.startswith("#"): continue
             if not chunk: continue
             genemapone = parser.ParseGenemap(chunk)
-            import_omim_genemap(genemapone.record)
+            import_one(genemapone.record)
 
-def import_omim_genemap(record):
+def import_one(record):
     with switch_db(dbmodels.OmimGenemap, "cmd-import") as OmimGenemap:
         try:
             genemap = OmimGenemap.objects.get(mimNumber = record['mimNumber'])

@@ -7,27 +7,23 @@ import lib.OmimEntry
 import lib.DGV
 import lib.OmimGenemap
 import lib.OmimMorbidmap
-"""
-class Command(BaseCommand):
-    help = ''
-    can_import_settings = True
+import lib.DecipherCNV
 
-    def add_arguments(self, parser):
-        parser.add_argument('poll_id', nargs='+', type=int)
-
-    def handle(self, *args, **options):
-        self.stdout.write("这是一个测试")
-"""
 class Command(BaseCommand):
 
-    help = u"Annodbase commands group"
+    help = u"""
+Annodbase commands group. There are below database:
+    1. OMIM
+    2. DGV
+    3. Decipher
+"""
 
-    def cmds_add(self, parser, cmds, hinfo=u"Help info", des=u"Description"):
+    def cmds_add(self, parser, cmds, hinfo="Help info", des="Description", phinfo="Help info"):
         cmds = parser.add_parser(
             cmds, formatter_class=RawDescriptionHelpFormatter,
             help=hinfo, description = textwrap.dedent(des)
         )
-        return cmds
+        return cmds.add_subparsers(help=phinfo)
 
     def print_args(self, **options):
         print "Args info:"
@@ -35,81 +31,115 @@ class Command(BaseCommand):
             print "\t%20s\t------->\t%-20s" % (key, value)
 
     def add_arguments(self, parser):
+        parser.formatter_class = RawDescriptionHelpFormatter
         #　子命令组
-        subparsers = parser.add_subparsers(help=u'sub-command help', parser_class=type(ArgumentParser()))
+        subparsers = parser.add_subparsers(help='sub-command help', parser_class=type(ArgumentParser()))
         # DGV命令组
-        dgv_cmds = self.cmds_add(
+        dgv_parser = self.cmds_add(
             subparsers, 'dgv',
             u"处理DGV数据库",
-            u"""处理DGV数据库,目前只有import功能"""
+            u"处理DGV数据库,目前只有import功能", "DGV commands"
         )
-        dgv_parser = dgv_cmds.add_subparsers(help=u"DGV commands")
         # DGV import action
-        self.dgv_parser_import(dgv_parser)
+        self.dgv_import(dgv_parser)
         # OMIM数据库命令组
-        omim_cmds = self.cmds_add(
+        omim_parser = self.cmds_add(
             subparsers, "omim",
             u"处理关于OMIM数据库的所有表。一共有n个表和OMIM有关",
             u"""
-            OMIM数据库的命令组
-            目前正在开发阶段，过程如下
-            1.完成entry表的导入功能
-            2.开发genemap表的导入功能
-            """
+            OMIM数据库的命令组,处理如下表
+            1.omim_entry
+            2.omim_genemap
+            3.omim_morbidmap
+            """, u"OMIM subtables"
         )
-        omim_parser = omim_cmds.add_subparsers(help=u"OMIM subtables")
         # OMIM -> ENTRY命令组
-        omim_entry_cmds = self.cmds_add(
+        omim_entry_parser = self.cmds_add(
             omim_parser, "entry",
             u"omim数据库entry表的命令组",
             u"""
             处理omim_entry表的各种动作
-            目前完成了entry表的导入命令:import
-            """
+            1. import
+            2. download
+            """, u"OMIM Entry table actions"
         )
-        omim_entry_parser = omim_entry_cmds.add_subparsers(help=u"OMIM Entry table actions")
         # OMIM ENTRY import action
-        self.omim_entry_parser_import(omim_entry_parser)
+        self.omim_entry_import(omim_entry_parser)
         # OMIM ENTRY download action
         self.omim_entry_download(omim_entry_parser)
 
         # OMIM -> genemap命令组
-        omim_genemap_cmds = self.cmds_add(
+        omim_genemap_parser = self.cmds_add(
             omim_parser, "genemap",
             u"omim数据库genemap表的命令组",
             u"""
             处理omim_genemap表的各种动作
-            目录开发genemap表的导入命令:import
-            """
+            1. import
+            2. update_entry
+            3. mim2gene_update
+            """, u"OMIM Genemap table actions"
         )
-        omim_genemap_parser = omim_genemap_cmds.add_subparsers(help=u"OMIM Genemap table actions")
         # OMIM Genemap import action
-        self.omim_genemap_parser_import(omim_genemap_parser)
+        self.omim_genemap_import(omim_genemap_parser)
         # OMIM Genemap update OMIM Entry action
-        self.omim_genemap_parser_update_entry(omim_genemap_parser)
+        self.omim_genemap_update_entry(omim_genemap_parser)
         # OMIM Genemap mim2gene_update action
-        self.omim_genemap_parser_mim2gene_update(omim_genemap_parser)
+        self.omim_genemap_mim2gene_update(omim_genemap_parser)
         # OMIM -> morbidmap命令组
-        omim_morbidmap_cmds = self.cmds_add(
+        omim_morbidmap_parser = self.cmds_add(
             omim_parser, "morbidmap",
             u"omim数据库morbidmap表的命令组",
             u"""
             处理omim_morbidmap表的各种动作
-            目前开发morbidmap表的导入命令:import
-            """
+            1. import
+            2. update_genemap
+            3. update_entry
+            """, u"Omim Morbidmap table actions"
         )
-        omim_morbidmap_parser = omim_morbidmap_cmds.add_subparsers(help=u"Omim Morbidmap table actions")
         ## Omim Morbidmap import action
-        self.omim_morbidmap_parser_import(omim_morbidmap_parser)
+        self.omim_morbidmap_import(omim_morbidmap_parser)
         ## OMIM Morbidmap update OMIM Genemap action
-        self.omim_morbidmap_parser_update_genemap(omim_morbidmap_parser)
+        self.omim_morbidmap_update_genemap(omim_morbidmap_parser)
         ## OMIM Morbidmap update OMIM Entry action
-        self.omim_morbidmap_parser_update_entry(omim_morbidmap_parser)
+        self.omim_morbidmap_update_entry(omim_morbidmap_parser)
+
+        # Decipher数据库命令组
+        decipher_parser = self.cmds_add(
+            subparsers, 'decipher', u"处理Decipher数据库",
+            u"""
+            Decipher数据库命令组, 处理如下表:
+            1.decipher_cnv
+            2.decipher_syndrome
+            """, u"Decipher subtables"
+        )
+        # Decipher -> cnv命令组
+        decipher_cnv_parser = self.cmds_add(decipher_parser,'cnv',
+            u"decipher数据库cnv表命令组",
+            u"""
+            处理decipher_cnv表的各种动作
+            1. import
+            """, u"decipher_cnv action cmds"
+        )
+        ## Decipher CNV import action
+        self.decipher_cnv_import(decipher_cnv_parser)
+
+
+
 
 
     """
     以下是调用的方法
     """
+    def decipher_cnv_import(self, parser):
+        cnv_import = parser.add_parser("import", help=u"导入decipher cnv的信息",
+            description = textwrap.dedent(u"""
+            导入Decipher CNV信息
+            """)
+        )
+        cnv_import.add_argument("--host", "-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        cnv_import.add_argument("--db", '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        cnv_import.set_defaults(func=lib.DecipherCNV.importdb)
+
     def omim_entry_download(self, parser):
         entry_download = parser.add_parser("download", help=u"从网上下载必要的信息到entry表中",
             description = textwrap.dedent(u"""
@@ -125,7 +155,7 @@ class Command(BaseCommand):
         entry_download.add_argument('--apikey','-a', type=str, help=u"OMIM网站的apikey,有默认值，但是需要定期更新", default="BK2V39hOQKibVY_Gud_bVQ")
         entry_download.set_defaults(func=lib.OmimEntry.download)
 
-    def omim_genemap_parser_mim2gene_update(self, parser):
+    def omim_genemap_mim2gene_update(self, parser):
         mim2gene_update_genemap = parser.add_parser("mim2gene_update", help=u"从输入文件中获得信息，导入到genemap表中",
             description = textwrap.dedent(u"""
             从mim2gene.txt和refFlat.txt文件获得信息，更新表genemap的染色体坐标信息。字段有:
@@ -139,7 +169,7 @@ class Command(BaseCommand):
         mim2gene_update_genemap.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
         mim2gene_update_genemap.set_defaults(func=lib.OmimGenemap.mim2gene_update)
 
-    def omim_morbidmap_parser_update_entry(self, parser):
+    def omim_morbidmap_update_entry(self, parser):
         morbidmap_update_entry = parser.add_parser("update_entry", help=u"从omim_morbidmap中获取信息，更新到omim_entry",
             description = textwrap.dedent(u"""
             通过mimNumber，从omim_morbidmap中获得信息更新到omim_entry的phenotypeMapList字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
@@ -152,7 +182,7 @@ class Command(BaseCommand):
         morbidmap_update_entry.add_argument("--morbidmapdb", "-mdb", type=str, help="db name for omim_morbidmap", default="dbtest")
         morbidmap_update_entry.set_defaults(func=lib.OmimMorbidmap.update_entry)
 
-    def omim_morbidmap_parser_import(self, parser):
+    def omim_morbidmap_import(self, parser):
         morbidmap_import = parser.add_parser("import", help=u"OMIM Morbidmap表的导入",
             description = textwrap.dedent(u"""
             导入Morbidmap表。处理morbidmap.txt文件，导入文件内容
@@ -161,10 +191,10 @@ class Command(BaseCommand):
         morbidmap_import.add_argument("--input","-i", type=str, help="Input file ususally is morbidmap.txt", required=True)
         morbidmap_import.add_argument("--host",'-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
         morbidmap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
-        morbidmap_import.set_defaults(func=lib.OmimMorbidmap.omim_morbidmap_import)
+        morbidmap_import.set_defaults(func=lib.OmimMorbidmap.importdb)
 
 
-    def omim_morbidmap_parser_update_genemap(self, parser):
+    def omim_morbidmap_update_genemap(self, parser):
         morbidmap_update_genemap = parser.add_parser("update_genemap", help=u"从omim_morbidmap中获取信息，更新到omim_genemap",
             description = textwrap.dedent(u"""
             通过mimNumber，从omim_morbidmap中获得信息更新到omim_genemap的phenotypeMapList字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
@@ -177,18 +207,7 @@ class Command(BaseCommand):
         morbidmap_update_genemap.add_argument("--morbidmapdb", "-mdb", type=str, help="db name for omim_morbidmap", default="dbtest")
         morbidmap_update_genemap.set_defaults(func=lib.OmimMorbidmap.update_genemap)
 
-    def omim_morbidmap_parser_import(self, parser):
-        morbidmap_import = parser.add_parser("import", help=u"OMIM Morbidmap表的导入",
-            description = textwrap.dedent(u"""
-            导入Morbidmap表。处理morbidmap.txt文件，导入文件内容
-            """)
-        )
-        morbidmap_import.add_argument("--input","-i", type=str, help="Input file ususally is morbidmap.txt", required=True)
-        morbidmap_import.add_argument("--host",'-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
-        morbidmap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
-        morbidmap_import.set_defaults(func=lib.OmimMorbidmap.omim_morbidmap_import)
-
-    def omim_genemap_parser_update_entry(self, parser):
+    def omim_genemap_update_entry(self, parser):
         genemap_update_entry = parser.add_parser("update_entry", help=u"""从omim_genemap中获得信息更新到omim_entry""",
             description = textwrap.dedent(u"""
             通过mimNumber，从omim_genemap中获得信息更新到omim_entry的geneMap字段。如果没给出mimNumber,则全部更新。mimNumber用空格分开
@@ -199,9 +218,9 @@ class Command(BaseCommand):
         genemap_update_entry.add_argument("--genemapdb", "-gdb", type=str, help="db name for omim_genemap", default="dbtest")
         genemap_update_entry.add_argument("--entryhost", '-eh', type=str, help="Host for omim_entry", default="mongodb://localhost:27017")
         genemap_update_entry.add_argument("--entrydb", '-edb', type=str, help="db name for omim_entry", default="dbtest")
-        genemap_update_entry.set_defaults(func=lib.OmimGenemap.omim_genemap_update_entry)
+        genemap_update_entry.set_defaults(func=lib.OmimGenemap.update_entry)
 
-    def omim_genemap_parser_import(self, parser):
+    def omim_genemap_import(self, parser):
         genemap_import = parser.add_parser('import', help=u"""OMIM Genemap表的导入""",
             description = textwrap.dedent(u"""
             导入Genemap表。处理genemap.txt文件，导入文件内容
@@ -210,9 +229,9 @@ class Command(BaseCommand):
         genemap_import.add_argument("--input",'-i', type=str, help="Input file ususally is genemap.txt", required=True)
         genemap_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="localhost:27017")
         genemap_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
-        genemap_import.set_defaults(func=lib.OmimGenemap.omim_genemap_import)
+        genemap_import.set_defaults(func=lib.OmimGenemap.importdb)
 
-    def dgv_parser_import(self, parser):
+    def dgv_import(self, parser):
         dgv_import = parser.add_parser('import',
             formatter_class=RawDescriptionHelpFormatter,
             help='Import GRCh37_hg19_supportingvariants_version.txt into mongodb',
@@ -235,9 +254,9 @@ class Command(BaseCommand):
         dgv_import.add_argument('--upsert', dest='upsert', action='store_true')
         dgv_import.add_argument('--no-upsert', dest='upsert', action='store_false')
         dgv_import.set_defaults(upsert=False)
-        dgv_import.set_defaults(func=lib.DGV.dgv_import)
+        dgv_import.set_defaults(func=lib.DGV.importdb)
 
-    def omim_entry_parser_import(self, parser):
+    def omim_entry_import(self, parser):
         entry_import = parser.add_parser('import',
             help=u"""OMIM Entry表的导入""",
             description = textwrap.dedent(u"""
@@ -247,7 +266,7 @@ class Command(BaseCommand):
         entry_import.add_argument('--input', '-i', type=str, help="Input file usually is omim.txt", required=True)
         entry_import.add_argument('--host', '-H', type=str, help="Host for mongodb such as localhost:27017", default="mongodb://localhost:27017")
         entry_import.add_argument('--db', '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
-        entry_import.set_defaults(func=lib.OmimEntry.omim_entry_import)
+        entry_import.set_defaults(func=lib.OmimEntry.importdb)
 
     def FUN(self, **options):
         print options['text']
