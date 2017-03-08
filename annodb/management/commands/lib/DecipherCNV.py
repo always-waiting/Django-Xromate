@@ -2,6 +2,7 @@
 
 import annodb.models as dbmodels
 import urllib3
+urllib3.disable_warnings()
 import re
 from bs4 import BeautifulSoup
 import json
@@ -9,7 +10,7 @@ from mongoengine import register_connection
 from mongoengine.context_managers import switch_db
 from threading import Thread
 from Queue import Queue
-"""
+
 positions = (
     { 'chr': 1, 'start': 1, 'end': 249250621 },
     { 'chr': 2, 'start': 1, 'end': 243199373 },
@@ -63,6 +64,86 @@ positions = (
     { 'chr': 'X', 'start': 1, 'end': 15527 },
     { 'chr': 'Y', 'start': 1, 'end': 5937 },
 )
+"""
+
+http = urllib3.PoolManager()
+
+def update_sex(cmdobj, **opt):
+    """
+    输入patient id更新sex信息
+    """
+    register_connection("cmd-update", opt['db'], opt['host'])
+    selectid = []
+    with switch_db(dbmodels.DecipherCnv,'cmd-update') as DecipherCNV:
+        try:
+            for i in opt['patient_id']:
+               selectid.extend(DecipherCNV.objects(patient_id=int(i)))
+        except TypeError,e:
+            selectid = DecipherCNV.objects
+        except Exception,e:
+            print e
+            selectid = DecipherCNV.objects
+        for cnv in selectid:
+            print cnv.patient_id
+            # 更新sex
+            href_sex = "https://decipher.sanger.ac.uk/patient/%s/overview/general" % cnv.patient_id
+            sex = ""
+            try:
+                tx = http.request('GET', href_sex)
+                if tx.status == 200:
+                    soup = BeautifulSoup(tx.data, 'lxml')
+                    content = soup.find("td").text
+                    if content.find("Age") != -1:
+                        sex = soup.find_all("tr")[1].find_all("td")[1].text.lstrip().rstrip()
+                    else:
+                        sex = soup.find("tr").find_all("td")[1].text.lstrip().rstrip()
+                    cnv.update(chr_sex=sex)
+                else:
+                    raise Exception("disconnect to "+href_sex)
+            except Exception, e:
+                print "[Error] for updating sex type of pid and noid(%s,%s) %s" % (cnv.patient_id, cnv.no_id, e)
+
+def update_phenotypes(cmdobj, **opt):
+    """
+    输入patient_id更新phenotypes信息
+    """
+    register_connection("cmd-update", opt['db'], opt['host'])
+    selectid = []
+    with switch_db(dbmodels.DecipherCnv,'cmd-update') as DecipherCNV:
+        try:
+            for i in opt['patient_id']:
+                selectid.extend(DecipherCNV.objects(patient_id=int(i)))
+        except TypeError,e:
+            selectid = DecipherCNV.objects
+        except Exception,e:
+            print e
+            selectid = DecipherCNV.objects
+        for cnv in selectid:
+            print cnv.patient_id
+            # 更新phenotypes
+            href = "https://decipher.sanger.ac.uk/patient/%s/phenotype" % cnv.patient_id
+            phenotypes = []
+            try:
+                tx = http.request('GET', href)
+                if tx.status == 200:
+                    soup = BeautifulSoup(tx.data, 'lxml')
+                    get = soup.find("a", href="#phenotype/patient-phenotypes")
+                    person = str(get['data-person'])
+                    href_phenotypes = 'https://decipher.sanger.ac.uk/patient/%s/person/%s/phenotypes' % (cnv.patient_id, person)
+                    tx = http.request('GET', href_phenotypes)
+                    if tx.status == 200:
+                        soup = BeautifulSoup(tx.data, 'lxml')
+                        get = soup.select('div[class~=phenotype-list-group] div[class~=phenotypes-container] div div span')
+                        for one in get:
+                            phenotypes.append(re.sub("\n|\s{2,}","",one.text).rstrip().lstrip())
+                    else:
+                        raise Exception("disconnect to %s" % href_phenotypes)
+                else:
+                    raise Exception("diconnect to %s" % href)
+            except Exception,e:
+                print "[Error] for updating phenotypes of pid and noid(%s,%s):%s" % (cnv.patient_id, cnv.no_id, e)
+            finally:
+                cnv.update(phenotypes=";".join(phenotypes))
 
 def importdb(cmdobj, **opt):
     """
@@ -79,7 +160,6 @@ def importdb(cmdobj, **opt):
     except Exception,e:
         print '[Error] for select chr use all:',e
         selectchr = positions
-    http = urllib3.PoolManager()
     url = "https://decipher.sanger.ac.uk/browser/API/CNV/Decipher.json"
     # 先删除吧
     with switch_db(dbmodels.DecipherCnv,'cmd-import') as DecipherCNV:
@@ -130,7 +210,6 @@ def update_phenotypes_sex(i, q):
         cnv = q.get()
         print "Worker",i,"get no id:", cnv.id
         patientId = str(cnv.patient_id)
-        http = urllib3.PoolManager()
         # 更新sex
         href_sex = "https://decipher.sanger.ac.uk/patient/"+patientId+"/overview/general"
         sex = ""

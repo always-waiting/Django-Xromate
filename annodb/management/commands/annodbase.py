@@ -122,14 +122,34 @@ Annodbase commands group. There are below database:
         )
         ## Decipher CNV import action
         self.decipher_cnv_import(decipher_cnv_parser)
-
-
-
-
+        self.decipher_cnv_update_sex(decipher_cnv_parser)
+        self.decipher_cnv_update_phenotypes(decipher_cnv_parser)
 
     """
     以下是调用的方法
     """
+    def decipher_cnv_update_phenotypes(self, parser):
+        update_phenotypes = parser.add_parser("update_phenotypes", help=u"更新phenotypes信息",
+            description = textwrap.dedent(u"""
+            通过输入patient_id更新phenotypes信息，一般用于import出错需要特别更新某些记录时
+            """)
+        )
+        update_phenotypes.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        update_phenotypes.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        update_phenotypes.add_argument("--patient_id","-p", type=int, nargs='*', help=u"patient id,没有全部更新")
+        update_phenotypes.set_defaults(func=lib.DecipherCNV.update_phenotypes)
+
+    def decipher_cnv_update_sex(self, parser):
+        update_sex = parser.add_parser("update_sex", help=u"更新性别信息",
+            description = textwrap.dedent(u"""
+            通过输入patient_id更新性别信息。一般用于import出错时，需要更新某些记录
+            """)
+        )
+        update_sex.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        update_sex.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        update_sex.add_argument("--patient_id","-p", type=int, nargs='*', help=u"patient id,没有全部更新")
+        update_sex.set_defaults(func=lib.DecipherCNV.update_sex)
+
     def decipher_cnv_import(self, parser):
         cnv_import = parser.add_parser("import", help=u"导入decipher cnv的信息",
             description = textwrap.dedent(u"""
