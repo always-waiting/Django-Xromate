@@ -7,6 +7,7 @@ from lib.OmimEntry import OmimEntry
 from lib.DgvVarient import DgvVarient
 from lib.OmimGenemap import OmimGenemap
 from lib.OmimMorbidmap import OmimMorbidmap
+from lib.DecipherCNV import DecipherCnv
 from apps import AnnodbConfig
 # Create your models here.
 

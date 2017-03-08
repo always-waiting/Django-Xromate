@@ -138,6 +138,7 @@ Annodbase commands group. There are below database:
         )
         cnv_import.add_argument("--host", "-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
         cnv_import.add_argument("--db", '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        cnv_import.add_argument("--chr","-c", type=int, nargs='*',help=u"想要更新的染色体，空是全部更新")
         cnv_import.set_defaults(func=lib.DecipherCNV.importdb)
 
     def omim_entry_download(self, parser):
