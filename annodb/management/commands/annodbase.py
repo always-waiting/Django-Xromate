@@ -10,6 +10,7 @@ import lib.OmimMorbidmap
 import lib.DecipherCNV
 import lib.DecipherSyndrome
 import lib.ClinVar
+import lib.GeneReview
 class Command(BaseCommand):
 
     help = u"""
@@ -148,9 +149,30 @@ Annodbase commands group. There are below database:
         ## ClinVar actions
         self.clinvar_import(clinvar_parser)
 
+        # GeneReview命令组
+        geneview_parser = self.cmds_add(subparsers,'genereview',u"处理GeneReview数据库",
+            u"""
+            GeneReview数据库命令组，处理如下表:
+            1. gene_review
+            """, u"GeneReview subtables"
+        )
+        # GeneReview actions
+        self.genereview_import(geneview_parser)
+
     """
     以下是调用的方法
     """
+    def genereview_import(self, parser):
+        genereview_import = parser.add_parser("import", help=u"导入GeneReview信息",
+            description = u"""
+            导入GeneReview信息
+            """
+        )
+        genereview_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        genereview_import.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        genereview_import.add_argument("--debug",action="store_true", help=u"是否打印更多信息，默认为False")
+        genereview_import.set_defaults(func=lib.GeneReview.importdb)
+
     def clinvar_import(self, parser):
         clinvar_import = parser.add_parser("import", help=u"导入ClinVar信息",
             description = textwrap.dedent(u"""

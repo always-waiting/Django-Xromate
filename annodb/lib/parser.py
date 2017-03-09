@@ -2,7 +2,9 @@
 import os
 import re
 import StringIO
+from ftplib import FTP
 from lxml import etree
+
 
 def test():
     print "测试导入"
@@ -483,7 +485,67 @@ class ParseClinVar(object):
     def __next__(self):
         print "good"
 
+class ParseGeneReview(object):
+    """
+    下载ftp://ftp.ncbi.nih.gov/pub/GeneReviews/GRshortname_NBKid_genesymbol_dzname.txt 文件，并解析出需要的内容
+    """
+    def __init__(self, url, path, filename, debug = False):
+        self.url = url
+        self.path = path
+        self.filename = filename
+        self.ftp = FTP(url)
+        self._data = []
+        self.debug = debug
 
+    def _handle_binary(self, more_data):
+        self._data.append(more_data)
+
+    def _download(self):
+        if self.debug:
+            print "Begin downloading"
+        self.ftp.login()
+        self.ftp.cwd(self.path)
+        self.ftp.retrbinary("RETR " + self.filename , callback=self._handle_binary)
+        if self.debug:
+            print "Finish downloading"
+            print "Generate genes dict"
+        self.data = "".join(self._data).split("\n")
+        if self.data[-1] == "":
+            self.data.pop(-1)
+        genes = {}
+        for item in self.data:
+            items = item.split("|")
+            if items[2] == '-' or items[2] == 'Not applicable':
+                continue
+            else:
+                try:
+                    try:
+                        items[3].encode("utf8")
+                        genes[items[2]]['accession_0'].append(items[1])
+                        genes[items[2]]['description_0'].append(items[3])
+                    except UnicodeDecodeError,e:
+                        continue
+                except KeyError,e:
+                    try:
+                        items[3].encode("utf8")
+                        genes[items[2]] = {"accession_0": [items[1]], 'description_0': [items[3]], 'gene_symbol': items[2]}
+                    except UnicodeDecodeError,e:
+                        continue
+        for key,value in genes.iteritems():
+            value['accession'] = ";".join(value['accession_0'])
+            value.pop('accession_0')
+            value['description'] = ";".join(value['description_0'])
+            value.pop("description_0")
+        self.genes = genes
+        if self.debug:
+            print "Finish generation"
+
+    def __iter__(self):
+        try:
+            return self.genes.itervalues()
+        except Exception,e:
+            self._download()
+            return self.genes.itervalues()
 
 def myreadlines(f, newline):
   buf = ""
