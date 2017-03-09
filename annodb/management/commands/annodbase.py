@@ -8,7 +8,7 @@ import lib.DGV
 import lib.OmimGenemap
 import lib.OmimMorbidmap
 import lib.DecipherCNV
-
+import lib.DecipherSyndrome
 class Command(BaseCommand):
 
     help = u"""
@@ -118,16 +118,39 @@ Annodbase commands group. There are below database:
             u"""
             处理decipher_cnv表的各种动作
             1. import
+            2. update_sex
+            3. update_phenotypes
             """, u"decipher_cnv action cmds"
         )
         ## Decipher CNV import action
         self.decipher_cnv_import(decipher_cnv_parser)
         self.decipher_cnv_update_sex(decipher_cnv_parser)
         self.decipher_cnv_update_phenotypes(decipher_cnv_parser)
+        # Decipher -> syndrome命令组
+        decipher_syndrome_parser = self.cmds_add(decipher_parser, 'syndrome',
+            u"decipher数据库syndrome表命令组",
+            u"""
+            处理decipher_syndrome表的各种动作
+            1. import
+            """,u"decipher_syndrome action cmds"
+        )
+        ## Decipher Syndrome actions
+        self.decipher_syndrome_import(decipher_syndrome_parser)
 
     """
     以下是调用的方法
     """
+    def decipher_syndrome_import(self, parser):
+        syndrome_import = parser.add_parser("import", help=u"导入decipher syndrome信息",
+            description = textwrap.dedent(u"""
+            导入Decipher Syndrome信息
+            """)
+        )
+        syndrome_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        syndrome_import.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        syndrome_import.add_argument("--chr","-c", type=int, nargs='*',help=u"想要更新的染色体，空是全部更新")
+        syndrome_import.set_defaults(func=lib.DecipherSyndrome.importdb)
+
     def decipher_cnv_update_phenotypes(self, parser):
         update_phenotypes = parser.add_parser("update_phenotypes", help=u"更新phenotypes信息",
             description = textwrap.dedent(u"""
