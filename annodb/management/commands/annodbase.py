@@ -9,6 +9,7 @@ import lib.OmimGenemap
 import lib.OmimMorbidmap
 import lib.DecipherCNV
 import lib.DecipherSyndrome
+import lib.ClinVar
 class Command(BaseCommand):
 
     help = u"""
@@ -137,9 +138,33 @@ Annodbase commands group. There are below database:
         ## Decipher Syndrome actions
         self.decipher_syndrome_import(decipher_syndrome_parser)
 
+        # ClinVar命令组
+        clinvar_parser = self.cmds_add(subparsers,'clinvar', u"处理ClinVar数据库",
+            u"""
+            ClinVar数据库命令组，处理如下表:
+            1. clin_var
+            """,u"ClinVar subtables"
+        )
+        ## ClinVar actions
+        self.clinvar_import(clinvar_parser)
+
     """
     以下是调用的方法
     """
+    def clinvar_import(self, parser):
+        clinvar_import = parser.add_parser("import", help=u"导入ClinVar信息",
+            description = textwrap.dedent(u"""
+            导入ClinVar信息,导入的信息有如下要求:
+            1. 是CNV记录，即type为Deletion,Duplication,copy number gain,copy number loss;
+            2. clinsign field is 'pathogenic' or 'likely pathogenic'
+            """)
+        )
+        clinvar_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        clinvar_import.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        clinvar_import.add_argument("--input","-i", type=str, help="path of xml file, downloaded from 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/'", required=True)
+        clinvar_import.add_argument("--debug",action="store_true", help=u"是否打印更多信息，默认为False")
+        clinvar_import.set_defaults(func=lib.ClinVar.importdb)
+
     def decipher_syndrome_import(self, parser):
         syndrome_import = parser.add_parser("import", help=u"导入decipher syndrome信息",
             description = textwrap.dedent(u"""

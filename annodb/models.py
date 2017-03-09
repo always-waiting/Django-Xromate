@@ -9,6 +9,7 @@ from lib.OmimGenemap import OmimGenemap
 from lib.OmimMorbidmap import OmimMorbidmap
 from lib.DecipherCNV import DecipherCnv
 from lib.DecipherSyndrome import DecipherSyndrome
+from lib.ClinVar import ClinVar
 from apps import AnnodbConfig
 # Create your models here.
 

@@ -2,7 +2,7 @@
 import os
 import re
 import StringIO
-
+from lxml import etree
 
 def test():
     print "测试导入"
@@ -362,6 +362,126 @@ class ParseEntry(object):
         mimnumber = content.next().rstrip().lstrip()
         self.record['mimNumber'] = int(mimnumber)
         print "Go throught mim", self.record['mimNumber']
+
+class ParseClinVar(object):
+    """
+    解析ClinVarFullRelease_00-latest.xml文件，生成可以导入mongo数据库的dict格式。
+    这个一个大型文件，需要用到一定的处理方式来确保运行效率
+    """
+    def __init__(self, filename, debug=False):
+        if not os.path.exists(filename): raise Exception("%s not exist!" % filename)
+        self.filename = filename
+        self.debug = debug
+        self._count = 0
+    def __enter__(self):
+        return self;
+    def __exit__(self ,type, value, traceback):
+        return False
+    def __iter__(self):
+        try:
+            if self.fileiter.closed:
+                self.fileiter = open(self.filename)
+            else:
+                self.fileiter.close()
+                self.fileiter = open(self.filename)
+        except AttributeError,e:
+            self.fileiter = open(self.filename)
+        return self._parseclinvar()
+
+    def _parseclinvar(self):
+        parseflag = False
+        buf = ""
+        for line in self.fileiter:
+            if re.match("<ClinVarSet .*>", line):
+                parseflag = True
+                buf += line
+            elif re.match("</ClinVarSet>", line):
+                parseflag = False
+                buf+= line
+                # 开始解析buf生成结果，然后yield回去
+                xmltree = etree.fromstring(buf)
+                yield self._generate(xmltree)
+                # 初始化
+                buf = ""
+            elif parseflag:
+                buf += line
+            else:
+                pass
+                #print line
+    def _generate(self, clinvar):
+        """
+        传递一条记录的xml tree对象，解析后生成需要的字典
+        """
+        self._count += 1
+        if not self._count%2000: print "parse count: %s" % self._count
+        RCVA = clinvar.find("ReferenceClinVarAssertion")
+        CVAs = clinvar.findall("ClinVarAssertion")
+        CVA = RCVA.find("ClinVarAccession")
+        rcv_accession = CVA.attrib['Acc']
+        Measure = RCVA.find('MeasureSet').find('Measure')
+        Name = Measure.find('Name')
+        if Name is None: return {}
+        type_ = Measure.attrib['Type']
+        if not (type_ == "Deletion" or\
+                type_ == "Duplication" or\
+                type_ == "copy number gain" or\
+                type_ == "copy number loss"):
+            return {}
+        clinsign = RCVA.find("ClinicalSignificance").find("Description").text
+        if clinsign.lower().find("pathogenic") == -1: return {}
+        CL = Measure.find("CytogeneticLocation")
+        Origin = RCVA.find("ObservedIn").find("Sample").find("Origin")
+        TS = RCVA.find("TraitSet").find("Trait")
+
+        allele_id = Measure.attrib['ID']
+        date_update = CVA.attrib['DateUpdated']
+        origin = Origin.text
+        name = Name.find('ElementValue').text
+        if CL is not None:
+            cytogenetic = CL.text
+        else:
+            cytogenetic = ""
+        seq_locations = Measure.findall("SequenceLocation")
+        (assembly, chrsymbol, start, end) = ('', '', -2, -2)
+        if not seq_locations:
+            seq_locations = list(Measure.iterdescendants("SequenceLocation"))
+
+        if not len(seq_locations) and self.debug:
+            print "\n1. %s does not have SequenceLocation\n" % rcv_accession
+        for seq_loc in seq_locations:
+            if seq_loc.attrib['Assembly'] == 'GRCh37':
+                chrsymbol = seq_loc.attrib['Chr']
+                assembly = seq_loc.attrib['Assembly']
+                start = seq_locations[0].attrib.get("innerStart",seq_locations[0].attrib.get("start",-1))
+                end = seq_locations[0].attrib.get("innerStop",seq_locations[0].attrib.get("stop",-1))
+                break
+        pubmeds = []
+        for item in CVAs:
+            for cit in item.iterdescendants("Citation"):
+                idd = cit.find("ID")
+                if idd is not None and idd.attrib['Source'] == 'PubMed':
+                    pubmeds.append(idd.text)
+        pubs = ",".join(pubmeds)
+        genereview = ""
+        if TS.find('AttributeSet') is not None and TS.find('AttributeSet').find("XRef") is not None:
+            if TS.find('AttributeSet').find("XRef").attrib['DB'] == 'GeneReviews':
+                genereview = TS.find('AttributeSet').find("XRef").attrib['ID']
+        if (start == -2 or end == -2) and self.debug:
+            print "\n2. %s start and end have not been modified" % rcv_accession
+        if (start == -1 or end == -1) and self.debug:
+            print "\n3. %s does not find start and end in node" % rcv_accession
+        doc_hash = {
+            "allele_id": allele_id, "type": type_, "name": name,
+            "rcv_accession": rcv_accession, "clinsign":clinsign, "origin": origin,
+            "assembly": assembly, "chr": chrsymbol, "start": start, 'end': end,
+            "cytogenetic":cytogenetic, "date_update":date_update,"pubmeds":pubs,
+            "gene_reviews":genereview,
+        }
+        return doc_hash
+    def next(self):
+        return self.__next__()
+    def __next__(self):
+        print "good"
 
 
 
