@@ -18,6 +18,8 @@ Annodbase commands group. There are below database:
     1. OMIM
     2. DGV
     3. Decipher
+    4. ClinVar
+    5. GeneReviews
 """
 
     def cmds_add(self, parser, cmds, hinfo="Help info", des="Description", phinfo="Help info"):
@@ -158,10 +160,25 @@ Annodbase commands group. There are below database:
         )
         # GeneReview actions
         self.genereview_import(geneview_parser)
+        self.genereview_download_html(geneview_parser)
 
     """
     以下是调用的方法
     """
+    def genereview_download_html(self, parser):
+        """
+        从NCBI上下载信息到本地
+        """
+        download_html = parser.add_parser("download_html", help=u"从NCBI上下载HTML文档",
+            description = u"""
+            从NCBI上下载HTML文档,文档先从 https://www.ncbi.nlm.nih.gov/books/NBK1116/ 获取信息后下载
+            """
+        )
+        download_html.add_argument("--outdir","-o",type=str, default = "./genereview_html" ,help=u"输出目录，默认为./genereview_html")
+        download_html.add_argument("--debug","-d", action="store_true", help=u"是否打印更多信息，默认为False")
+        download_html.add_argument("--nthread","-n", type=int, default=10, help=u"处理线程数，默认为10")
+        download_html.set_defaults(func=lib.GeneReview.download_html)
+
     def genereview_import(self, parser):
         genereview_import = parser.add_parser("import", help=u"导入GeneReview信息",
             description = u"""
