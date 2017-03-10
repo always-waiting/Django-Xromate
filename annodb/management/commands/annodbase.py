@@ -171,6 +171,8 @@ Annodbase commands group. There are below database:
         genereview_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
         genereview_import.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
         genereview_import.add_argument("--debug",action="store_true", help=u"是否打印更多信息，默认为False")
+        genereview_import.add_argument("--nthread","-n", type=int,default=10, help=u"下载线程数默认为10")
+        genereview_import.add_argument("--test",action="store_true", help=u"测试，不真的操作数据库")
         genereview_import.set_defaults(func=lib.GeneReview.importdb)
 
     def clinvar_import(self, parser):

@@ -4,7 +4,11 @@ import re
 import StringIO
 from ftplib import FTP
 from lxml import etree
-
+from Queue import Queue
+from threading import Thread
+import json
+import urllib3
+urllib3.disable_warnings()
 
 def test():
     print "测试导入"
@@ -489,18 +493,58 @@ class ParseGeneReview(object):
     """
     下载ftp://ftp.ncbi.nih.gov/pub/GeneReviews/GRshortname_NBKid_genesymbol_dzname.txt 文件，并解析出需要的内容
     """
-    def __init__(self, url, path, filename, debug = False):
+    def __init__(self, url, path, filename, debug = False, nthread = 10):
         self.url = url
         self.path = path
         self.filename = filename
         self.ftp = FTP(url)
         self._data = []
+        self.queue = Queue()
+        self.thread = []
+        self.http = urllib3.PoolManager()
         self.debug = debug
+        self.nthread = nthread
+        for i in range(self.nthread):
+            worker = Thread(target=self._update_location, args=(i,))
+            worker.setDaemon(True)
+            self.thread.append(worker)
+        if debug:
+            print "生成ParserGeneReview对象"
+
+    def _update_location(self, num):
+        while True:
+            if self.debug:
+                print "Worker %s is working" % num
+            one = self.queue.get()
+            url = "http://grch37.rest.ensembl.org/lookup/symbol/homo_sapiens/%s?content-type=application/json" % one['gene_symbol']
+            try:
+                if self.debug:
+                    print "下载%s" % one['gene_symbol']
+                tx = self.http.request('GET', url)
+                if tx.status == 200:
+                    data = json.loads(tx.data.decode('utf-8'))
+                    one['chr'] = data['seq_region_name']
+                    one['end'] = int(data['end'])
+                    one['start'] = int(data['start'])
+                elif tx.status == 400:
+                    if self.debug:
+                        print "%s is not find in web" % (one['gene_symbol'])
+                else:
+                    raise Exception("下载%s坐标失败" % one['gene_symbol'])
+            except Exception,e:
+                if self.debug:
+                    print "[Error] for get %s\n%s" % (url, e)
+            finally:
+                self.queue.task_done()
+            if self.queue.qsize() == 0:
+                if self.debug:
+                    print "队列为空"
+                break
 
     def _handle_binary(self, more_data):
         self._data.append(more_data)
 
-    def _download(self):
+    def download(self):
         if self.debug:
             print "Begin downloading"
         self.ftp.login()
@@ -540,11 +584,27 @@ class ParseGeneReview(object):
         if self.debug:
             print "Finish generation"
 
+    def download_location(self):
+        if self.debug:
+            print "Begin update location info"
+        try:
+            self.genes
+        except:
+            self.download()
+        for one in self.genes.itervalues():
+            self.queue.put(one)
+        for worker in self.thread:
+            worker.start()
+        for worker in self.thread:
+            worker.join()
+        self.queue.join()
+
     def __iter__(self):
         try:
             return self.genes.itervalues()
         except Exception,e:
-            self._download()
+            self.download()
+            self.download_location()
             return self.genes.itervalues()
 
 def myreadlines(f, newline):
