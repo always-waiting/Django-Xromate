@@ -11,6 +11,7 @@ from lib.DecipherCNV import DecipherCnv
 from lib.DecipherSyndrome import DecipherSyndrome
 from lib.ClinVar import ClinVar
 from lib.GeneReview import GeneReview
+from lib.Pubmed import Pubmed
 from apps import AnnodbConfig
 # Create your models here.
 

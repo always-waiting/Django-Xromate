@@ -11,6 +11,8 @@ import lib.DecipherCNV
 import lib.DecipherSyndrome
 import lib.ClinVar
 import lib.GeneReview
+import lib.Pubmed
+
 class Command(BaseCommand):
 
     help = u"""
@@ -20,6 +22,7 @@ Annodbase commands group. There are below database:
     3. Decipher
     4. ClinVar
     5. GeneReviews
+    6. Pubmed
 """
 
     def cmds_add(self, parser, cmds, hinfo="Help info", des="Description", phinfo="Help info"):
@@ -162,9 +165,34 @@ Annodbase commands group. There are below database:
         self.genereview_import(geneview_parser)
         self.genereview_download_html(geneview_parser)
 
+        # Pubmed命令组
+        pubmed_parser = self.cmds_add(subparsers, 'pubmed',u'处理Pubmed数据库',
+            u'''
+            Pubmed数据库命令组，处理表:
+            1. pubmed
+            ''',u'Pubmed subtables'
+        )
+        # Pubmed actions
+        self.pubmed_import(pubmed_parser)
+
     """
     以下是调用的方法
     """
+    def pubmed_import(self, parser):
+        """
+        通过自定义文件，导入样本信息
+        """
+        pubmed_import = parser.add_parser('import', help=u'通过文件，导入样本信息',
+            description = u"""
+            通过文件调入样本信息，文件一般为CNV片段文献报道.xlsx
+            """
+        )
+        pubmed_import.add_argument("--debug","-d", action="store_true", help=u"是否打印更多信息，默认为False")
+        pubmed_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        pubmed_import.add_argument("--db",'-D', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        pubmed_import.add_argument("--input","-i", type=str, help="path of input file, which is given by lidongshuang or liuerhong", required=True)
+        pubmed_import.set_defaults(func=lib.Pubmed.importdb)
+
     def genereview_download_html(self, parser):
         """
         从NCBI上下载信息到本地
@@ -209,7 +237,7 @@ Annodbase commands group. There are below database:
     def decipher_syndrome_import(self, parser):
         syndrome_import = parser.add_parser("import", help=u"导入decipher syndrome信息",
             description = textwrap.dedent(u"""
-            导入Decipher Syndrome信息
+            导入Decipher Syndrome信息,从https://decipher.sanger.ac.uk/browser/API/CNV/Syndrome.json上按照染色体下载
             """)
         )
         syndrome_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
@@ -242,7 +270,7 @@ Annodbase commands group. There are below database:
     def decipher_cnv_import(self, parser):
         cnv_import = parser.add_parser("import", help=u"导入decipher cnv的信息",
             description = textwrap.dedent(u"""
-            导入Decipher CNV信息
+            导入Decipher CNV信息, 从 https://decipher.sanger.ac.uk/browser/API/CNV/Decipher.json 上下载，并且去除重复的patient_id的cnv
             """)
         )
         cnv_import.add_argument("--host", "-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")

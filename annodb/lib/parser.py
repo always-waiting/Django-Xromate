@@ -8,6 +8,7 @@ from Queue import Queue
 from threading import Thread
 import json
 import urllib3
+from openpyxl import load_workbook
 urllib3.disable_warnings()
 
 def test():
@@ -606,6 +607,84 @@ class ParseGeneReview(object):
             self.download()
             self.download_location()
             return self.genes.itervalues()
+
+class ParsePubmed(object):
+    """
+    通过输入文件解析生成可以导入pubmed表的数据，文件一般有刘二红或李东双给出
+    """
+    def __init__(self, filename, debug=False):
+        if not os.path.exists(filename):
+            raise Exception("%s not exists!" % filename)
+        self.filename = filename
+        self.debug = debug
+
+    def generate_data(self):
+        wb = load_workbook(filename = self.filename)
+        wh = wb['Sheet1']
+        self.data = []
+        head = {
+                1: 'name', 2: 'gender', 6: 'location', 9: 'gainloss', 10: 'description',
+                11: 'pmid', 12: 'cytoband', 13: 'size', 14: 'origin_position', 15: 'critical',
+                16: 'hg_ver', 17: 'inheritance', 18: 'have_fulltext', 19: 'note',
+                20: 'extra_desc', 21: 'auditor', 22: 'comment'
+        }
+        for row in wh.iter_rows():
+            if row[0].value.find(u"样本信息") != -1 or row[0].value.find(u"编号") != -1:
+                continue
+            data = {};name = ""
+            for cell in row:
+                try:
+                    head[cell.col_idx]
+                except KeyError,e:
+                    cellvalue = cell.value if cell.value else 'None'
+                    if self.debug: print "Unknown field\n\tIndex -> %s\n\tValue -> %s" % (cell.col_idx, cellvalue)
+                    continue
+                if cell.col_idx == 1:
+                    name = cell.value.encode()
+                elif re.search("description|cytoband|size|origin_position|critical|hg_ver|inheritance|note|extra_desc|auditor|comment",head[cell.col_idx]):
+                    if cell.value:
+                        data[head[cell.col_idx]] = cell.value
+                    else:
+                        pass
+                elif head[cell.col_idx] == 'gender':
+                    if cell.value and cell.value.find(u"男") != -1:
+                        data['gender'] = 1
+                    elif cell.value and cell.value.find(u"女") != -1:
+                        data['gender'] = 0
+                    elif not cell.value:
+                        if self.debug: print "%s lack of gender" % name
+                    else:
+                        raise Exception("%s name's gender is %s: can not parse" % name, cell.value)
+                elif head[cell.col_idx] == 'location':
+                    if cell.value:
+                        (data['chr'], pos) = cell.value.encode().replace("chr","").split(":")
+                        (data['start'], data['end']) = list(map(int, pos.split("-")))
+                    else:
+                        if self.debug: print "%s lack of 位置" % name
+                        data['chr'] = "";data['end'] = 0;data['start'] = 0
+                elif head[cell.col_idx] == 'gainloss':
+                    if not cell.value:
+                        if self.debug: print "%s lack of 突变类型" % name
+                    elif cell.value.find(u"重复") != -1:
+                        data['gainloss'] = 'gain'
+                    elif cell.value.find(u"缺失") != -1:
+                        data['gainloss'] = 'loss'
+                    else:
+                        raise Exception("%s type is %s: can not parser" % name, cell.value)
+                elif head[cell.col_idx] == 'pmid':
+                    if not cell.value:
+                        if self.debug: print "%s lack of PMID号" % name
+                    else:
+                        data['pmid'] = str(cell.value).split("/")
+                elif head[cell.col_idx] == 'have_fulltext':
+                    if not cell.value:
+                        if self.debug: print "%s lack of 全文判读" % name
+                    else:
+                        data['have_fulltext'] = True if cell.value.find(u"有") != -1 else False
+                else:
+                    raise Exception("%s遗漏了一个域%s" % (name, head[cell.col_idx]))
+            self.data.append(data)
+        return self.data
 
 def myreadlines(f, newline):
   buf = ""

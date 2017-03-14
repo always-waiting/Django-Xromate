@@ -253,5 +253,6 @@ def update_phenotypes_sex(i, q):
         finally:
             cnv.update(chr_sex=sex, phenotypes=";".join(phenotypes))
             q.task_done()
+        if q.empty(): break
 
 
