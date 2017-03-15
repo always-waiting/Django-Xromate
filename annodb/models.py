@@ -13,6 +13,7 @@ from lib.ClinVar import ClinVar
 from lib.GeneReview import GeneReview
 from lib.Pubmed import Pubmed
 from lib.UcscRefflat import UcscRefflat
+from lib.Cytoband import Cytoband
 from apps import AnnodbConfig
 # Create your models here.
 

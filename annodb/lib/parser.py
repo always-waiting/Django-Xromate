@@ -709,6 +709,22 @@ class ParsePubmed(object):
             self.data.append(data)
         return self.data
 
+class ParseCytoband(object):
+    def __init__(self, fp, debug=False):
+        if not os.path.exists(fp): raise Exception("%s not exists" % fp)
+        self.filename = fp
+        self.debug = debug
+        self.parser_cytoband()
+    def parser_cytoband(self):
+        if self.debug: print "Parsing filename: %s" % self.filename
+        self.cytobands = []
+        with open(self.filename) as f:
+            for line in f:
+                items = line.rstrip().split("\t")
+                one = {'chrom': items[0], 'start': int(items[1]), 'end': int(items[2]),
+                        'name': items[3], 'description': items[4], 'chr': items[0].replace('chr',"")}
+                self.cytobands.append(one)
+
 def myreadlines(f, newline):
   buf = ""
   while True:
