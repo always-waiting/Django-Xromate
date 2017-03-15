@@ -12,7 +12,7 @@ import lib.DecipherSyndrome
 import lib.ClinVar
 import lib.GeneReview
 import lib.Pubmed
-
+import lib.UcscRefflat
 class Command(BaseCommand):
 
     help = u"""
@@ -23,6 +23,7 @@ Annodbase commands group. There are below database:
     4. ClinVar
     5. GeneReviews
     6. Pubmed
+    7. Ucsc RefFlat
 """
 
     def cmds_add(self, parser, cmds, hinfo="Help info", des="Description", phinfo="Help info"):
@@ -175,9 +176,40 @@ Annodbase commands group. There are below database:
         # Pubmed actions
         self.pubmed_import(pubmed_parser)
 
+        # Ucsc数据库
+        ucsc = self.cmds_add(subparsers, 'ucsc',u"处理Ucsc数据库",
+            u'''
+            Ucsc数据库命令组，目前有表:
+            1. refflat
+            ''', u'ucsc subtables'
+        )
+        # Ucsc RefFlat表
+        ucsc_refflat = self.cmds_add(ucsc, 'refflat', u'处理Ucsc数据库',
+            u'''
+            处理RefFlat表
+            ''', 'ucsc_refflat table'
+        )
+        # Ucsc RefFlat actions
+        self.ucsc_refflat_import(ucsc_refflat)
+
     """
     以下是调用的方法
     """
+    def ucsc_refflat_import(self, parser):
+        """
+        通过refflat.txt文件导入生成数据库表
+        """
+        refflat_import = parser.add_parser('import', help=u'通过文件，导入生成数据库',
+            description = u"""
+            通过refflat.txt文件导入生成数据库表ucsc_refflat
+            """
+        )
+        refflat_import.add_argument("--debug","-d", action="store_true", help=u"是否打印更多信息，默认为False")
+        refflat_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
+        refflat_import.add_argument("--db",'-D', type=str, help="Database used for mongo such as dbtest", default="dbtest")
+        refflat_import.add_argument("--input","-i", type=str, help="path of input file, which is refFlat.txt download from http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refFlat.txt.gz", required=True)
+        refflat_import.set_defaults(func=lib.UcscRefflat.importdb)
+
     def pubmed_import(self, parser):
         """
         通过自定义文件，导入样本信息

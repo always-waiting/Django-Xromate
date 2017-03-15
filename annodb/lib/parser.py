@@ -37,32 +37,55 @@ class ParseRefFlat(object):
     """
     解析整个refFlat.txt文件
     """
-    def __init__(self, fp):
+    def __init__(self, fp, debug=False):
+        if not os.path.exists(fp): raise Exception("%s not exists" % fp)
         self.gene = {}
-        self.parse_refflat(fp)
+        self.debug = debug
+        self.filename = fp
+        self.parse_refflat()
 
-    def parse_refflat(self,filepath):
-        if not os.path.exists(filepath): raise Exception(filepath + " not exists")
-        with open(filepath) as f:
+    def parse_refflat(self):
+        if self.debug: print "Parsing filename %s" % self.filename
+        with open(self.filename) as f:
             for line in f:
-                match = re.search("(\S+)\t\S+\tchr(\S+)\t(\S)\t(\d+)\t(\d+)", line)
+                match = re.search("(\S+)\t(\S+)\tchr(\S+)\t(\S)\t(\d+)\t(\d+)\t(\d+)\t(\d+)\t(\d+)\t(\S+)\t(\S+)", line)
+                #match = re.search("(\S+)\t\S+\tchr(\S+)\t(\S)\t(\d+)\t(\d+)", line)
                 if match:
-                    pos = { 'name': match.group(1), 'chr': match.group(2), 'strand': match.group(3),
-                        'start': int(match.group(4)), 'end': int(match.group(5))
+                    pos = {
+                        'geneName': match.group(1), 'name': match.group(2), 'chrom': match.group(3), 'strand': match.group(4),
+                        'txStart': int(match.group(5)), 'txEnd': int(match.group(6)), 'cdsStart': int(match.group(7)),
+                        'cdsEnd': int(match.group(8)), 'exonCount': int(match.group(9)),
+                        'exonStarts': list(map(int, match.group(10).rstrip(',').split(','))),
+                        'exonEnds': list(map(int, match.group(11).rstrip(',').split(',')))
+                        #'name': match.group(1), 'chr': match.group(2), 'strand': match.group(3),
+                        #'start': int(match.group(4)), 'end': int(match.group(5))
                     }
-                    if re.match("^([1-9]|1[0-9]|2[0-2]|[XY])$", pos['chr']):
-                        self.gene[pos['name']] = pos
+                    if re.match("^([1-9]|1[0-9]|2[0-2]|[XY])$", pos['chrom']):
+                        if self.gene.has_key(pos['geneName']):
+                            self.gene[pos['geneName']].append(pos)
+                        else:
+                            self.gene[pos['geneName']] = [pos]
+        if self.debug: print "Parsing filename Done"
     def make_changes(self, symbol):
+        if self.debug: print "Make changes for %s(TO OMIM Genemaps)" % symbol
         symbolist = list(map(str,range(1,23)))
         symbolist.extend(['X','Y'])
         symbol2chr = dict(zip(symbolist, list(range(1,25))))
-        changes = {
+        try:
+            gene = self.gene[symbol]
+        except KeyError,e:
+            print "Not found key %s" % e
+            return {}
+        chrom = gene[0]['chrom']; strand = gene[0]['strand']
+        start = min(list(map(lambda x: x['txStart'], gene)))
+        end = max(list(map(lambda x: x['txEnd'], gene)))
+        changes = { # 这里起始位置用所有坐标最小值，终止位置为最大值,力求包含所有区域
             "approvedGeneSymbol": symbol,
-            'chromosome': symbol2chr[self.gene[symbol]['chr']],
-            'chromosomeSymbol': self.gene[symbol]['chr'],
-            'chromosomeLocationStart': self.gene[symbol]['start'],
-            'chromosomeLocationEnd': self.gene[symbol]['end'],
-            'chromosomeLocationStrand': self.gene[symbol]['strand']
+            'chromosome': symbol2chr[chrom],
+            'chromosomeSymbol': chrom,
+            'chromosomeLocationStart': start,
+            'chromosomeLocationEnd': end,
+            'chromosomeLocationStrand': strand
         }
         return changes
 
