@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+ 
+{% block title %}学习myQueue{% endblock %}
+ 
+{% block content %}
+<div class='ui accordion'>
+  <h1 class='ui header title'>
+    <i class='dropdown icon'></i>
+    学习Queue
+  </h1>
+  <div class='content'>
+    <p>队列在网站中的应用，兴趣来源于自动分析问题。当在网页上点击提交分析后，后台自动把提交的批次放到队列中，再通过一个API,让其他人可以获得队列中的批次编号，以便进行分析</p>
+  </div>
+  <div class="ui inverted divider"></div>
+  <h1 class='ui header title'>
+    <i class="dropdown icon"></i>
+    学习任务
+  </h1>
+  <div class='content'>
+    <div class="ui ordered list">
+      <a class="item" href={% url 'myqueue_fid' %}>先写出动作发起网页</a>
+      <a class="item">产生需要的队列,这个队列在网站一直存在，当用户发送批次给网站时，就会存储到队列中</a>
+      <a class='item' href={% url 'myqueue_fid_pop' %}>构造url每次从队列中获取批次信息</a>
+    </div>
+  </div>
+</div>
+<script>
+  $('.ui.accordion').accordion();
+</script>
+{% endblock %}

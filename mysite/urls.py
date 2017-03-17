@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^annodb/', include("annodb.urls")),
     url(r'^genoverse/', include("genoverse.urls")),
     url(r'^admin/', admin.site.urls),
+    url(r'^myqueue/', include("myQueue.urls")),
     url(r'^api/',include("restful.urls")),
 ]
 

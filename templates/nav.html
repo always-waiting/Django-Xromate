@@ -7,6 +7,7 @@
       <div class="menu">
         <a class="item" href={% url 'genoverse_index' %}>Genoverse</a>
         <a class="item" href={% url 'annodb_index'%}>AnnoDB</a>
+        <a class='item' href={% url 'myqueue_index'%}>myQueue</a>
         <a class="item">待定</a>
       </div>
     </div>
@@ -18,5 +19,7 @@
     $('#study_list').children("a").first().text("Genoverse");
   } else if (window.location.pathname.match('/annodb/')) {
     $('#study_list').children("a").first().text("AnnoDB");
+  } else if (window.location.pathname.match('/myqueue/')) {
+    $('#study_list').children("a").first().text("myQueue");
   }
 </script>

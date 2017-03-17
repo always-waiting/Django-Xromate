@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}输入fid，插入到队列{% endblock %}
+
+{% block content %}
+<form class="ui form" action="/myqueue/fid/", method="POST">
+  <h1>输入需要分析的批次</h1>
+  <div class="field">
+      <label>Flowcell</label>
+      <input type="text" name="fid" placeholder="XXXXXXXX">
+  </div>
+  <button class="ui button" type="submit">Submit</button>
+  <div class="ui error message"></div>
+</form>
+<script>
+$('.ui.form').form({
+  fields:{
+    flowcell: {
+      identifier: 'fid',
+      rules:[
+        {
+          type: 'empty',
+          prompt: 'Please inport flowcell'
+        },
+        {
+          type: 'exactLength[10]',
+          prompt: 'Flowcell should be 10 chars'
+        }
+      ]
+    },
+  }
+});
+$('.ui.button').click(function(){
+  console.log("把待分析批次放到队列中")
+})
+</script>
+
+{% endblock %}

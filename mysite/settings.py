@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 Django settings for mysite project.
 
@@ -11,6 +12,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+#import djcelery
+#djcelery.setup_loader()
+#BROKER_URL= 'amqp://guest@localhost//'
+#CELERY_RESULT_BACKEND = 'amqp://guest@localhost//'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +46,8 @@ INSTALLED_APPS = [
     'homepage',
     'annodb',
     'restful',
+    'myQueue',
+    #'djcelery',
     #'dbtest',
 ]
 
@@ -149,3 +156,5 @@ LOGGING = {
         },
     },
 }
+
+# 创建一个队列
