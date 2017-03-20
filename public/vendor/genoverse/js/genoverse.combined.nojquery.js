@@ -7143,10 +7143,17 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
   repeatLabels  : true,
   bump          : true,
   parseData: function(d) {
+    console.log(d.length)
     for (var a in d) {
       f = d[a];
       //console.log(f)
       //console.log(this.browser)
+      /*
+      前段DGV展示规则:
+      1. dgv.end >= cnv.end
+      2. dgv.start <= cnv.start
+      3. cnv.gainloss = 'gain' --> dgv.observedGains > 0 or cnv.gainloss = 'loss' --> dgv.observedLosses > 0
+      */
       if (f.end >= this.browser.cnv.end && f.start <= this.browser.cnv.start && (
             this.browser.cnv.gainloss == 'gain' ? f.observedGains > 0 :
             this.browser.cnv.gainloss == 'loss' ? f.observedLosses > 0 : false)) {
@@ -7177,6 +7184,183 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
       'Genes'           : feature.genes ? $.isArray(feature.genes) ? feature.genes.join(', ') : feature.genes : '-'
     };
   }
+});
+
+
+Genoverse.Track.RefGene = Genoverse.Track.extend({
+  labels : true,
+  repeatLabels: true,
+  bump: true,
+  id     : 'refgene',
+  name   : 'UCSC: refGene',
+  height : 60,
+  autoHeight: false,
+  hideEmpty : false,
+  url    : '/api/annodb/ucscrefgene?chr=__CHR__&start=__START__&end=__END__',
+  category: "UCSC refGene",
+  info:  "Refgene",
+  featureHeight: 6,
+  tags: [],
+  controls: [],
+
+  parseData: function (data) {
+    for (var i = 0; i < data.length; i++) {
+      var f = data[i];
+      f.id = f.name;
+      f.label= f.geneName || f.name;
+      f.start= f.txStart;
+      f.end= f.txEnd;
+      f.strand = f.strand == "-" ? -1 : 1;
+      this.insertFeature(f);
+    }
+  },
+  populateMenu: function (feature) {
+    var menu = {
+      title    : feature.label,
+      Location : this.browser.chr + ':' + feature.start + '-' + feature.end,
+      Name     : feature.name,
+      GeneName : feature.geneName
+    };
+    return menu;
+  },
+  setFeatureColor: function (feature) {
+    var color = '#3BB9FF';
+    feature.color = feature.labelColor = color;
+  },
+
+  // Different settings for different zoom level
+  10000000: { // This one applies when > 10M base-pairs per screen
+    labels : false
+  },
+});
+
+
+Genoverse.Track.OMIMGenemap = Genoverse.Track.extend({
+  id     : 'omimGeneMap',
+  name   : 'OMIM: GeneMap',
+  category: "OMIM GeneMaps",
+  info : "OMIM - Online Mendelian Inheritance in Man",
+  tags: "GeneMap",
+  height : 160,
+  autoHeight: true,
+  hideEmpty : false,
+  featureHeight: 6,
+  labels: true,
+  repeatLabels: true,
+  bump: true,
+  url: "/api/annodb/omimgenemap?chr=__CHR__&start=__START__&end=__END__",
+
+  parseData: function(d) {
+    for( var g in d){
+      var f = d[g];
+      f.id = f.mimNumber;
+      f.name = f.approvedGeneSymbol;
+      f.start = f.chromosomeLocationStart;
+      f.end = f.chromosomeLocationEnd;
+      f.label = f.id;
+      if ('undefined' !== typeof f.phenotypeMapList && f.phenotypeMapList.length > 0) {
+        for (var p in f.phenotypeMapList) {
+          var pheno = f.phenotypeMapList[p].phenotypeMap;
+          if ('undefined' !== typeof pheno.phenotypeMimNumber && pheno.mimNumber !== pheno.phenotypeMimNumber) {
+            if('undefined' === typeof f.phenotypeMimNumber) {
+              f.phenotypeMimNumber = pheno.phenotypeMimNumber;
+            } else {
+              if ($.isArray(f.phenotypeMimNumber)) {
+                f.phenotypeMimNumber.push(pheno.phenotypeMimNumber);
+              } else {
+                f.phenotypeMimNumber = [f.phenotypeMimNumber, pheno.phenotypeMimNumber];
+              }
+            }
+          }
+        }
+      }
+      if('undefined' !== typeof f.phenotypeMimNumber){
+        f.label = f.name ? f.name : '';
+        this.insertFeature(f);
+      }
+    }
+  },
+
+  setFeatureColor: function(f) {
+    switch ( f.confidence ) {
+      case 'C': f.color = '#008000';break;
+      case 'P': f.color = "#008080";break;
+      case 'L': f.color = "#A0A0A0";break;
+      case 'I': f.color = "#C0C0C0";break;
+      default: f.color = "#F0F0F0";break;
+    }
+    f.labelColor = f.color;
+  },
+  populateMenu: function(a,b) {
+      var url = '/entry/omim/' + a.mimNumber;
+      var c={},
+      d = [
+        ["title", '<a target="_blank" href="/entry/omim/'+a.mimNumber+'">' + a.name +'</b></a>'],
+        ["Location", a.chromosome + ":" + a.chromosomeLocationStart + "-" + a.chromosomeLocationEnd],
+        ["CytoLocation", a.cytoLocation],
+        ["MIM number", '<a target="_blank" href="/entry/omim/'+a.mimNumber+'"><b>'+a.mimNumber+'</b></a>'],
+        ["Phenotype MIM", $.isArray(a.phenotypeMimNumber) ? a.phenotypeMimNumber.map(function(v){
+          return '<a target="_blank" href="/entry/omim/'+v+'"><b>'+v+'</b></a>';
+        }).join(',') :'<a target="_blank" href="/entry/omim/'+a.phenotypeMimNumber+'"><b>'+a.phenotypeMimNumber+'</b></a>'],
+        ["Gene", a.geneName],
+        ["Confidence", a.confidence],
+        ["GeneSymbols", a.geneSymbols],
+        ["Mapping method", a.mappingMethod]
+      ], f;
+      for (f in d) "undefined" !== typeof d[f][1] && (c[d[f][0]] = d[f][1]);
+      return $.extend(c, b)
+    }
+});
+
+
+Genoverse.Track.OMIMMorbidmap = Genoverse.Track.extend({
+  id : "omimSyndrome",
+  name: "OMIM Syndromes",
+  category: "OMIM Syndromes",
+  info: "OMIM Syndromes - Syndromes without phenotype maps",
+  tags: [ "syndrome", "omim" ],
+  height: 160,
+  autoHeight: true,
+  hideEmpty: false,
+  featureHeight: 4,
+  labels: true,
+  repeatLabels: true,
+  bump: true,
+  url: "/api/annodb/omimmorbidmap?chr=__CHR__&start=__START__&end=__END__",
+
+  parseData: function(data) {
+    for( var i in data) {
+      var f = data[i];
+      f.id = f.phenotypeMimNumber;
+      f.name = f.phenotype + " (" + f.phenotypeMappingKey + ")";
+      f.label = f.id + ": " + f.name;
+      this.insertFeature(f);
+    }
+  },
+
+  setFeatureColor: function(f) {
+    switch ( f.phenotypeMappingKey ) {
+      case 4: f.color = '#008000';break;
+      case 3: f.color = "#008080";break;
+      case 2: f.color = "#A0A0A0";break;
+      case 1: f.color = "#C0C0C0";break;
+      default: f.color = "#F0F0F0";break;
+    }
+    f.labelColor = f.color;
+  },
+  populateMenu: function(a,b) {
+      var url = '/entry/omim/' + a.mimNumber;
+      var c={},
+      d = [
+        ["title", '<a target="_blank" href="/entry/omim/'+a.id+'">' + a.name +'</b></a>'],
+        ["Location", a.chr+ ":" + a.start+ "-" + a.end],
+        ["CytoLocation", a.cytoLocation],
+        ["Genemap MIM Number", a.geneMapExists ? '<a target="_blank" href="/entry/omim/'+a.mimNumber+'"><b>'+a.mimNumber+'</b></a>' : null],
+        ["Gene Symbols", a.geneSymbols],
+      ], f;
+      for (f in d) "undefined" !== typeof d[f][1] && (c[d[f][0]] = d[f][1]);
+      return $.extend(c, b)
+    }
 });
 
 

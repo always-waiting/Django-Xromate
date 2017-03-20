@@ -17,45 +17,31 @@
 </div>
 
 <script>
+  $('genoverse').empty()
   $(document).ready(function () {
-    new Genoverse({
+    config = $.extend({
       container : '#genoverse',
       width     : $('.ui.genoverse.container').width(),
       genome    : 'grch37',
-      cnv       : {chr: 1, start: 149040001, end: 149200000, type: 'Mosaic', copy: 1.05, log2: -0.01, result : 'test', description : 'description test', gainloss: "gain"},
+      cnv       : {chr: 4, start: 69380001, end: 69480000, type: 'Mosaic', copy: 1.05, log2: -0.01, result : 'test', description : 'description test', gainloss: "loss"},
       flowcell  : 'ABCDEFG',
       sample    : {name:'16XBhV005'},
-      chr       : 1,
-      start     : 149040001,
-      end       : 149200000,
+      chr       : 4,
+      start     : 69380001,
+      end       : 69480000,
       plugins   : [ 'controlPanel', 'karyotype', 'trackControls', 'resizer', 'focusRegion', 'fullscreen', 'tooltips', 'fileDrop' ],
       tracks    : [
         Genoverse.Track.Scaleline,
         Genoverse.Track.Scalebar,
         Genoverse.Track.Chromosome,
         Genoverse.Track.CNV,
-        //Genoverse.Track.Positive,
-        //Genoverse.Track.Pubmed,
         Genoverse.Track.DGV,
-        /*Genoverse.Track.extend({
-          name       : 'Sequence',
-          controller : Genoverse.Track.Controller.Sequence,
-          model      : Genoverse.Track.Model.Sequence.Ensembl,
-          view       : Genoverse.Track.View.Sequence,
-          100000     : false,
-          resizable  : 'auto'
-        }),*/
-        //Genoverse.Track.Gene,
-        /*Genoverse.Track.extend({
-          name            : 'Regulatory Features',
-          url             : 'http://rest.ensembl.org/overlap/region/human/__CHR__:__START__-__END__?feature=regulatory;content-type=application/json',
-          resizable       : 'auto',
-          model           : Genoverse.Track.Model.extend({ dataRequestLimit : 5000000 }),
-          setFeatureColor : function (f) { f.color = '#AAA'; }
-        }),*/
-        //Genoverse.Track.dbSNP
+        Genoverse.Track.RefGene,
+        Genoverse.Track.OMIMGenemap,
+        Genoverse.Track.OMIMMorbidmap,
       ]
-    });
+    })
+    new Genoverse(config)
   });
 </script>
 
