@@ -161,26 +161,32 @@ def importdb(cmdobj, **opt):
         print '[Error] for select chr use all:',e
         selectchr = positions
     url = "https://decipher.sanger.ac.uk/browser/API/CNV/Decipher.json"
+    if opt['debug']: print "Import chrom are %s" % str(selectchr)
     # 先删除吧
     with switch_db(dbmodels.DecipherCnv,'cmd-import') as DecipherCNV:
+        if opt['debug']: print "Delect info"
         for chr_info in selectchr:
+            if opt['debug']: print "\t-->Delect chr%s info" % chr_info
             DecipherCNV.objects(chr=str(chr_info['chr'])).delete()
+        if opt['debug']: print "Downloading info"
         for item in selectchr:
+            if opt['debug']: print "\t-->Downloading chr%s info" % item
             try:
                 r = http.request('GET', url, fields=item)
-                if not r.status == 200:
-                    print "访问失败"
-                    continue
-                datas = json.loads(r.data.decode('utf-8'))
-                for one in datas:
-                    one['no_id'] = one['id']
-                    one.pop('id')
-                    deciphercnv = DecipherCNV.objects.create(**one)
-                    deciphercnv.save()
-                    #perl中的操作是为了去除有相同patient_id的cnv，我认为这样做不好，尝试保留所有cnv
             except urllib3.exceptions.MaxRetryError, e:
                 print e
+                continue
+            if not r.status == 200:
+                print "访问失败"
+                continue
+            datas = json.loads(r.data.decode('utf-8'))
+            for one in datas:
+                one['no_id'] = one['id']
+                one.pop('id')
+                deciphercnv = DecipherCNV.objects.create(**one)
+                deciphercnv.save()
         # 删除重复的patient_id
+        if opt['debug']: print "Delect duplicate patient id"
         Delete = DecipherCNV.objects.aggregate(
             {'$group':{'_id':'$patient_id', 'count':{'$sum':1}}},
             {'$match':{'count':{'$gt' : 1 }}},
@@ -190,28 +196,31 @@ def importdb(cmdobj, **opt):
         # 更新表型和性别信息
         ## 设置队列
         queue = Queue()
-        ## 设置多线程
-        for i in range(10):
-            worker = Thread(target=update_phenotypes_sex,args=(i, queue))
-            worker.setDaemon(True)
-            worker.start()
         ## 设置队列信息
+        if opt['debug']: print "Put objects into queue"
         for chr_info in selectchr:
             for item in DecipherCNV.objects(chr=str(chr_info['chr'])):
                 queue.put(item)
+        ## 设置多线程
+        if opt['debug']: print "Set thread number: %s" % opt['thread']
+        for i in range(opt['thread']):
+            worker = Thread(target=update_phenotypes_sex,args=(i, queue, opt['debug']))
+            worker.setDaemon(True)
+            worker.start()
         #onecnv = DecipherCNV.objects(patient_id=249937)[0];
         #queue.put(onecnv)
         ## 等待队列结束
         queue.join()
 
 
-def update_phenotypes_sex(i, q):
+def update_phenotypes_sex(i, q, debug=False):
     while True:
+        if q.empty(): break
         cnv = q.get()
-        print "Worker",i,"get no id:", cnv.id
-        patientId = str(cnv.patient_id)
+        if debug: print "Worker",i,"handle with no_id:", cnv.no_id
         # 更新sex
-        href_sex = "https://decipher.sanger.ac.uk/patient/"+patientId+"/overview/general"
+        if debug: print "\t-->updating %s sex" % cnv.no_id
+        href_sex = "https://decipher.sanger.ac.uk/patient/%s/overview/general" % cnv.patient_id
         sex = ""
         try:
             tx = http.request('GET', href_sex)
@@ -223,13 +232,14 @@ def update_phenotypes_sex(i, q):
                 else:
                     sex = soup.find("tr").find_all("td")[1].text.lstrip().rstrip()
             else:
-                raise Exception("disconnect to "+href_sex)
+                raise Exception("disconnect to %s" % href_sex)
         except Exception, e:
-            print "[Error] for updating sex type of pid and noid(",patientId, cnv.no_id,"):", e
+            print "[Error] for updating sex type of pid and noid(%s,%s):%s" % (cnv.patient_id, cnv.no_id, e)
             q.task_done()
             continue
         # 更新phenotypes
-        href = "https://decipher.sanger.ac.uk/patient/"+patientId+"/phenotype"
+        if debug: print "\t-->updating %s phenotypes" % cnv.no_id
+        href = "https://decipher.sanger.ac.uk/patient/%s/phenotype" % cnv.patient_id
         phenotypes = []
         try:
             tx = http.request('GET', href)
@@ -237,7 +247,7 @@ def update_phenotypes_sex(i, q):
                 soup = BeautifulSoup(tx.data, 'lxml')
                 get = soup.find("a", href="#phenotype/patient-phenotypes")
                 person = str(get['data-person'])
-                href_phenotypes = 'https://decipher.sanger.ac.uk/patient/'+patientId+'/person/'+person+'/phenotypes'
+                href_phenotypes = 'https://decipher.sanger.ac.uk/patient/%s/person/%s/phenotypes' % (cnv.patient_id, person)
                 tx = http.request('GET', href_phenotypes)
                 if tx.status == 200:
                     soup = BeautifulSoup(tx.data, 'lxml')
@@ -245,14 +255,14 @@ def update_phenotypes_sex(i, q):
                     for one in get:
                         phenotypes.append(re.sub("\n|\s{2,}","",one.text).rstrip().lstrip())
                 else:
-                    raise Exception("disconnect to "+href_phenotypes)
+                    raise Exception("disconnect to %s"%href_phenotypes)
             else:
-                raise Exception("diconnect to "+href)
+                raise Exception("diconnect to %s"%href)
         except Exception,e:
-            print "[Error] for updating phenotypes of pid and noid(",patientId, cnv.no_id,"):", e
-        finally:
+            print "[Error] for updating phenotypes of pid and noid(%s,%s):%s"%(cnv.patient_id, cnv.no_id, e)
+        else:
             cnv.update(chr_sex=sex, phenotypes=";".join(phenotypes))
+        finally:
             q.task_done()
-        if q.empty(): break
 
 

@@ -346,6 +346,8 @@ Annodbase commands group. There are below database:
             导入Decipher CNV信息, 从 https://decipher.sanger.ac.uk/browser/API/CNV/Decipher.json 上下载，并且去除重复的patient_id的cnv
             """)
         )
+        cnv_import.add_argument("--thread",'-t', type=int, default=10, help=u"Thread number for update phenotypes and sex default is 10")
+        cnv_import.add_argument("--debug",'-D',action='store_true', help=u"More info for running, default is False")
         cnv_import.add_argument("--host", "-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
         cnv_import.add_argument("--db", '-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
         cnv_import.add_argument("--chr","-c", type=int, nargs='*',help=u"想要更新的染色体，空是全部更新")
