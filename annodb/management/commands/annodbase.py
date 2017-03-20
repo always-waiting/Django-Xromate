@@ -203,10 +203,26 @@ Annodbase commands group. There are below database:
         )
         # Cytoband　actions
         self.cytoband_import(cytoband)
+        self.cytoband_update_omimmorbid(cytoband)
 
     """
     以下是调用的方法
     """
+    def cytoband_update_omimmorbid(self, parser):
+        """
+        通过cytoband给omim_morbidmap表添加坐标
+        """
+        update_omimmorbid = parser.add_parser('update_omimmorbidmap', help=u'更新omim morbidmap表',
+            description = u'通过cytoband更新omim morbidmap表的坐标, 给定一个cytoband region,从cytoband表查询坐标后，更新到omim morbidmap中'
+        )
+        update_omimmorbid.add_argument("--debug","-d", action="store_true", help=u"是否打印更多信息，默认为False")
+        update_omimmorbid.add_argument("--cytohost",'-ch', type=str, help='Host of cytoband table', default="mongodb://localhost:27017")
+        update_omimmorbid.add_argument("--cytodb", '-cdb', type=str, help='Database name of cytoband table', default='dbtest')
+        update_omimmorbid.add_argument('--morbidhost','-mh',type=str, help='Host of omim morbidmap table',default="mongodb://localhost:27017")
+        update_omimmorbid.add_argument('--morbiddb','-mdb',type=str, help='Database name of omim morbidmap table',default='dbtest')
+        update_omimmorbid.add_argument('--cytoband','-cyto', nargs='*', help=u'需要更新的cytoband region,不输入就会更新morbidmap所有cytoband region的坐标')
+        update_omimmorbid.set_defaults(func=lib.Cytoband.update_omimmorbidmap)
+
     def cytoband_import(self, parser):
         """
         通过cytoband.txt文件导入数据库，存储cytoband信息
