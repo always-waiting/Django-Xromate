@@ -3,7 +3,7 @@ Genoverse.Track.Pubmed = Genoverse.Track.extend({
   name    : 'Pubmed',
   category: 'Pubmed',
   info    : "Pubmed - CNV diseases related pubmed articles",
-  url    : 'http://192.168.4.168:9009/api/genoverse/pubmed?chr=__CHR__&start=__START__&end=__END__',
+  url    : '/api/annodb/pubmed?chr=__CHR__&start=__START__&end=__END__',
   height  : 50,
   autoHeight  : true,
   hideEmpty   : false,

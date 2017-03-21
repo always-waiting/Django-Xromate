@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^clinvar/$', views.clinvar, name='annodb_clinvar'),
     url(r'^genereview/$', views.genereview, name='annodb_genereview'),
     url(r'^deciphersyndrome/$', views.deciphersyndrome, name='annodb_deciphersyndrome'),
+    url(r'^pubmed/$', views.pubmed, name='annodb_pubmed'),
 ]

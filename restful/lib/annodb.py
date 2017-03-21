@@ -96,3 +96,14 @@ def deciphersyndrome(request):
     redirect_url = reverse("annodb_deciphersyndrome")
     redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
     return redirect(redirect_url)
+
+def pubmed(request):
+    """
+    通过参数获得数据库中的区段信息
+    """
+    chrnum = request.GET['chr']
+    start = request.GET['start']
+    end = request.GET['end']
+    redirect_url = reverse("annodb_pubmed")
+    redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
+    return redirect(redirect_url)
