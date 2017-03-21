@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^omimmorbidmap/$', views.omimmorbidmap, name='annodb_omimmorbidmap'),
     url(r'^deciphercnv/$', views.deciphercnv, name='annodb_deciphercnv'),
     url(r'^clinvar/$', views.clinvar, name='annodb_clinvar'),
+    url(r'^genereview/$', views.genereview, name='annodb_genereview'),
 ]

@@ -537,13 +537,14 @@ class ParseGeneReview(object):
 
     def _update_location(self, num):
         while True:
-            if self.debug:
-                print "Worker %s is working" % num
+            if self.debug: print "Worker %s is working" % num
+            if self.queue.qsize() == 0:
+                if self.debug: print "队列为空"
+                break
             one = self.queue.get()
             url = "http://grch37.rest.ensembl.org/lookup/symbol/homo_sapiens/%s?content-type=application/json" % one['gene_symbol']
             try:
-                if self.debug:
-                    print "下载%s" % one['gene_symbol']
+                if self.debug: print "下载%s" % one['gene_symbol']
                 tx = self.http.request('GET', url)
                 if tx.status == 200:
                     data = json.loads(tx.data.decode('utf-8'))
@@ -551,19 +552,13 @@ class ParseGeneReview(object):
                     one['end'] = int(data['end'])
                     one['start'] = int(data['start'])
                 elif tx.status == 400:
-                    if self.debug:
-                        print "%s is not find in web" % (one['gene_symbol'])
+                    if self.debug: print "%s is not find in web" % (one['gene_symbol'])
                 else:
                     raise Exception("下载%s坐标失败" % one['gene_symbol'])
             except Exception,e:
-                if self.debug:
-                    print "[Error] for get %s\n%s" % (url, e)
+                if self.debug: print "[Error] for get %s\n%s" % (url, e)
             finally:
                 self.queue.task_done()
-            if self.queue.qsize() == 0:
-                if self.debug:
-                    print "队列为空"
-                break
 
     def _handle_binary(self, more_data):
         self._data.append(more_data)
