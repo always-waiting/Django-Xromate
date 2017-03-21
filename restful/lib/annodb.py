@@ -75,4 +75,15 @@ def genereview(request):
     end = request.GET['end']
     redirect_url = reverse("annodb_genereview")
     redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
+
+def deciphersyndrome(request):
+    """
+    通过参数获得数据库中的区段信息
+    """
+    chrnum = request.GET['chr']
+    start = request.GET['start']
+    end = request.GET['end']
+    redirect_url = reverse("annodb_deciphersyndrome")
+    redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
+    return redirect(redirect_url)
     return redirect(redirect_url)

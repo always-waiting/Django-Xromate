@@ -23,12 +23,12 @@
       container : '#genoverse',
       width     : $('.ui.genoverse.container').width(),
       genome    : 'grch37',
-      cnv       : {chr: 11, start: 65440001, end: 65720000, type: 'Mosaic', copy: 1.05, log2: -0.01, result : 'test', description : 'description test', gainloss: "loss"},
+      cnv       : {chr: 7, start: 72744455, end: 74142672, type: 'Mosaic', copy: 1.05, log2: -0.01, result : 'test', description : 'description test', gainloss: "loss"},
       flowcell  : 'ABCDEFG',
       sample    : {name:'16XBhV005'},
-      chr       : 11,
-      start     : 65440001,
-      end       : 65720000,
+      chr       : 7,
+      start     : 72744455,
+      end       : 74142672,
       plugins   : [ 'controlPanel', 'karyotype', 'trackControls', 'resizer', 'focusRegion', 'fullscreen', 'tooltips', 'fileDrop' ],
       tracks    : [
         Genoverse.Track.Scaleline,
@@ -42,6 +42,7 @@
         Genoverse.Track.DecipherCNV,
         Genoverse.Track.ClinVar,
         Genoverse.Track.GeneReview,
+        Genoverse.Track.DecipherSyndrome,
 
       ]
     })

@@ -53,20 +53,22 @@ def importdb(cmdobj, **opt):
         selectchr = positions
     url = 'https://decipher.sanger.ac.uk/browser/API/CNV/Syndrome.json'
     with switch_db(dbmodels.DecipherSyndrome,'cmd-import') as DecipherSyndrome:
+        if opt['debug']: print "Deleting old info"
         for chr_info in selectchr:
             DecipherSyndrome.objects(chr=str(chr_info['chr'])).delete()
         for item in selectchr:
+            if opt['debug']: print "Downloading chr%s info" % item
             try:
                 r = http.request('GET', url, fields=item)
-                if not r.status == 200:
-                    print "访问失败"
-                    continue
-                datas = json.loads(r.data.decode('utf-8'))
-                for one in datas:
-                    one['no_id'] = one['id']
-                    one.pop('id')
-                    deciphersyndrome = DecipherSyndrome.objects.create(**one)
-                    deciphersyndrome.save()
             except urllib3.exceptions.MaxRetryError, e:
-                print e
+                print e;continue;
+            if not r.status == 200:
+                print "访问失败"
+                continue
+            datas = json.loads(r.data.decode('utf-8'))
+            for one in datas:
+                one['no_id'] = one['id']
+                one.pop('id')
+                deciphersyndrome = DecipherSyndrome.objects.create(**one)
+                deciphersyndrome.save()
 

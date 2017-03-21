@@ -313,6 +313,7 @@ Annodbase commands group. There are below database:
             导入Decipher Syndrome信息,从https://decipher.sanger.ac.uk/browser/API/CNV/Syndrome.json上按照染色体下载
             """)
         )
+        syndrome_import.add_argument("--debug",action="store_true", help=u"是否打印更多信息，默认为False")
         syndrome_import.add_argument("--host","-H", type=str, help="Host for mongodb such as mongodb://localhost:27017", default="mongodb://localhost:27017")
         syndrome_import.add_argument("--db",'-d', type=str, help="Database used for mongo such as dbtest", default="dbtest")
         syndrome_import.add_argument("--chr","-c", type=int, nargs='*',help=u"想要更新的染色体，空是全部更新")
