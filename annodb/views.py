@@ -117,3 +117,22 @@ def deciphercnv(request):
         [json.loads(item.to_json()) for item in result],
         safe = False
     )
+
+def clinvar(request):
+    """
+    按照坐标选取重合Clinvar区域,规则如下:
+    """
+    chrom = request.GET['chr']
+    start = int(request.GET['start'])
+    end = int(request.GET['end'])
+    query = {
+        'chr': chrom,
+        'start__lte': end,
+        'end__gte': start
+    }
+    result = models.ClinVar.objects(**query)
+    logger.info(result)
+    return JsonResponse(
+        [json.loads(item.to_json()) for item in result],
+        safe=False,
+    )

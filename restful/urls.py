@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^annodb/omimgenemap', views.annodb.omimgenemap, name='api_anondb_omimgenemap'),
     url(r'^annodb/omimmorbidmap', views.annodb.omimmorbidmap, name='api_annodb_omimmorbidmap'),
     url(r'^annodb/deciphercnv', views.annodb.deciphercnv, name='api_annodb_deciphercnv'),
+    url(r'^annodb/clinvar', views.annodb.clinvar, name='api_annodb_clinvar'),
 ]

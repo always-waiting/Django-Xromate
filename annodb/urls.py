@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^omimgenemap/$', views.omimgenemap, name='annodb_omimgenemap'),
     url(r'^omimmorbidmap/$', views.omimmorbidmap, name='annodb_omimmorbidmap'),
     url(r'^deciphercnv/$', views.deciphercnv, name='annodb_deciphercnv'),
+    url(r'^clinvar/$', views.clinvar, name='annodb_clinvar'),
 ]
