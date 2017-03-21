@@ -4,7 +4,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
   category: "DGV variants(hg19)",
   info: "DGV - A curated catalogue of human genomic structural variation",
   tags: ["DGV"],
-  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__&type=__TYPE__",
   xhrFields: {
     withCredentials: !0
   },

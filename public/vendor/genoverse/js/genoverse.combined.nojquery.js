@@ -3996,8 +3996,13 @@ Genoverse.Track.Model = Base.extend({
       start = 1;
       end   = this.browser.chromosomeSize;
     }
-
-    return (url || this.url).replace(/__ASSEMBLY__/, this.browser.assembly).replace(/__CHR__/, this.browser.chr).replace(/__START__/, start).replace(/__END__/, end);
+    type =　this.browser.cnv.gainloss
+    if (type) {
+      console.log("###############",type)
+      return (url || this.url).replace(/__ASSEMBLY__/, this.browser.assembly).replace(/__CHR__/, this.browser.chr).replace(/__START__/, start).replace(/__END__/, end).replace(/__TYPE__/, type);
+    } else {
+      return (url || this.url).replace(/__ASSEMBLY__/, this.browser.assembly).replace(/__CHR__/, this.browser.chr).replace(/__START__/, start).replace(/__END__/, end);
+    }
   },
 
   setLabelBuffer: function (buffer) {
@@ -7131,7 +7136,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
   category: "DGV variants(hg19)",
   info: "DGV - A curated catalogue of human genomic structural variation",
   tags: ["DGV"],
-  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__&type=__TYPE__",
   xhrFields: {
     withCredentials: !0
   },

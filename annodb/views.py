@@ -25,16 +25,21 @@ def dgv(request):
     """
     chrnum = request.GET['chr']
     chrnum = int(chrnum) if chrnum.isdigit() else chrnum
-    start = request.GET['start']
-    start = int(start)
-    end = request.GET['end']
-    end = int(end)
+    start = int(request.GET['start'])
+    end = int(request.GET['end'])
     query = {
         'chr': chrnum,
         'start__lte': end,
         'end__gte': start,
         'mergedOrSample': 'S',
     }
+    if request.GET.has_key('type'):
+        cnvtype = request.GET['type']
+        if cnvtype.find("loss") != -1:
+            query['observedLosses__gt'] = 0
+        elif cnvtype.find("gain") != -1:
+            query['observedGains__gt'] = 0
+    #logger.info(query)
     result = models.DgvVarient.objects(**query).limit(20)
     #logger.error(result)
     return JsonResponse(

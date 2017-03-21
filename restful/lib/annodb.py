@@ -1,6 +1,10 @@
 # coding: utf-8
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+import logging
+
+logger = logging.getLogger('django')
+
 
 # Create api/annodb views here
 def dgv(request):
@@ -8,7 +12,12 @@ def dgv(request):
     start = request.GET['start']
     end = request.GET['end']
     redirect_url = reverse("annodb_dgv")
-    redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
+    if request.GET.has_key('type'):
+        cnvtype = request.GET['type']
+        #logger.info(cnvtype)
+        redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s&type=%s" % (chrnum, start, end, cnvtype)])
+    else:
+        redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
     return redirect(redirect_url)
 
 def ucscrefgene(request):
@@ -75,6 +84,7 @@ def genereview(request):
     end = request.GET['end']
     redirect_url = reverse("annodb_genereview")
     redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
+    return redirect(redirect_url)
 
 def deciphersyndrome(request):
     """
@@ -85,5 +95,4 @@ def deciphersyndrome(request):
     end = request.GET['end']
     redirect_url = reverse("annodb_deciphersyndrome")
     redirect_url = "?".join([redirect_url, "chr=%s&start=%s&end=%s" % (chrnum, start, end)])
-    return redirect(redirect_url)
     return redirect(redirect_url)
