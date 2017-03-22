@@ -7,7 +7,7 @@ Genoverse.Track.RefGene = Genoverse.Track.extend({
   height : 60,
   autoHeight: false,
   hideEmpty : false,
-  url    : '/api/annodb/ucscrefgene?chr=__CHR__&start=__START__&end=__END__',
+  url    : '/api/annodb/ucscrefgene/__CHR__:__START__-__END__',
   category: "UCSC refGene",
   info:  "Refgene",
   featureHeight: 6,

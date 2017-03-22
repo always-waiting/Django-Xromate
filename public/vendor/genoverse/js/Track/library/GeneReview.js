@@ -4,7 +4,7 @@ Genoverse.Track.GeneReview = Genoverse.Track.extend({
   category: "GeneReviews(hg19)",
   info: "GeneReviews - an international point-of-care resource for busy clinicians",
   tags: ["GeneReviews"],
-  url: "/api/annodb/genereview?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/genereview/__CHR__:__START__-__END__",
   xhrFields: {
     withCredentials: !0
   },

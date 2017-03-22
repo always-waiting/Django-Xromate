@@ -4,7 +4,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
   category: "DGV variants(hg19)",
   info: "DGV - A curated catalogue of human genomic structural variation",
   tags: ["DGV"],
-  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__&type=__TYPE__",
+  url: "/api/annodb/dgv/__CHR__:__START__-__END__?type=__TYPE__",
   xhrFields: {
     withCredentials: !0
   },
@@ -29,7 +29,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
       if (f.end >= this.browser.cnv.end && f.start <= this.browser.cnv.start && (
             this.browser.cnv.gainloss == 'gain' ? f.observedGains > 0 :
             this.browser.cnv.gainloss == 'loss' ? f.observedLosses > 0 : false)) {
-        console.log("Good")
+        //console.log("Good")
         f.name = f.variantAccession;
         f.id = f.name;
         f.label = f.id + ' - ' + f.variantSubtype;

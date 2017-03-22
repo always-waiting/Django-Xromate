@@ -4,7 +4,7 @@ Genoverse.Track.ClinVar = Genoverse.Track.extend({
   category: "ClinVar(hg19)",
   info: "ClinVar - aggregates information about genomic variation and its relationship to human health",
   tags: ["ClinVar"],
-  url: "/api/annodb/clinvar?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/clinvar/__CHR__:__START__-__END__",
   xhrFields: {
     withCredentials: !0
   },
@@ -21,7 +21,7 @@ Genoverse.Track.ClinVar = Genoverse.Track.extend({
       var start = f.start > this.browser.cnv.start ? f.start : this.browser.cnv.start;
       var end = f.end < this.browser.cnv.end ? f.end : this.browser.cnv.end;
       var percent = (end - start + 1) / (f.end - f.start + 1);
-      console.log(percent)
+      //console.log(percent)
       if ( f.assembly == 'GRCh37' && (
           (this.browser.cnv.gainloss == 'gain' && (f.type == 'copy number gain' || f.type == 'Duplication')) ||
           (this.browser.cnv.gainloss == 'loss' && (f.type == 'copy number loss' || f.type == 'Deletion'))) &&

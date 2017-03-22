@@ -11,7 +11,7 @@ Genoverse.Track.OMIMMorbidmap = Genoverse.Track.extend({
   labels: true,
   repeatLabels: true,
   bump: true,
-  url: "/api/annodb/omimmorbidmap?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/omimmorbidmap/__CHR__:__START__-__END__",
 
   parseData: function(data) {
     for( var i in data) {

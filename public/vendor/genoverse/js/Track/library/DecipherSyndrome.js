@@ -4,7 +4,7 @@ Genoverse.Track.DecipherSyndrome = Genoverse.Track.extend({
   category  : 'Decipher Syndrome',
   info      : 'Decipher Syndrome',
   tags      : ['decipher', 'syndrome'],
-  url       : '/api/annodb/deciphersyndrome?chr=__CHR__&start=__START__&end=__END__',
+  url       : '/api/annodb/deciphersyndrome/__CHR__:__START__-__END__',
   height    : 20,
   autoheight  : true,
   hideEmpty   : false,

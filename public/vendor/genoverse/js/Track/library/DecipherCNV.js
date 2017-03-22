@@ -4,7 +4,7 @@ Genoverse.Track.DecipherCNV = Genoverse.Track.extend({
   category: "DECIPHER CNVs",
   info: "Copy-number variants observed in other DECIPHER patients",
   tags: ["Patients", "DECIPHER", "Other"],
-  url: "/api/annodb/deciphercnv?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/deciphercnv/__CHR__:__START__-__END__",
   height: 200,
   featureHeight: 6,
   autoheight: true,

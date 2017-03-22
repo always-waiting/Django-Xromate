@@ -7136,7 +7136,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
   category: "DGV variants(hg19)",
   info: "DGV - A curated catalogue of human genomic structural variation",
   tags: ["DGV"],
-  url: "/api/annodb/dgv?chr=__CHR__&start=__START__&end=__END__&type=__TYPE__",
+  url: "/api/annodb/dgv/__CHR__:__START__-__END__?type=__TYPE__",
   xhrFields: {
     withCredentials: !0
   },
@@ -7161,7 +7161,7 @@ Genoverse.Track.DGV = Genoverse.Track.extend({
       if (f.end >= this.browser.cnv.end && f.start <= this.browser.cnv.start && (
             this.browser.cnv.gainloss == 'gain' ? f.observedGains > 0 :
             this.browser.cnv.gainloss == 'loss' ? f.observedLosses > 0 : false)) {
-        console.log("Good")
+        //console.log("Good")
         f.name = f.variantAccession;
         f.id = f.name;
         f.label = f.id + ' - ' + f.variantSubtype;
@@ -7200,7 +7200,7 @@ Genoverse.Track.RefGene = Genoverse.Track.extend({
   height : 60,
   autoHeight: false,
   hideEmpty : false,
-  url    : '/api/annodb/ucscrefgene?chr=__CHR__&start=__START__&end=__END__',
+  url    : '/api/annodb/ucscrefgene/__CHR__:__START__-__END__',
   category: "UCSC refGene",
   info:  "Refgene",
   featureHeight: 6,
@@ -7252,7 +7252,7 @@ Genoverse.Track.OMIMGenemap = Genoverse.Track.extend({
   labels: true,
   repeatLabels: true,
   bump: true,
-  url: "/api/annodb/omimgenemap?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/omimgenemap/__CHR__:__START__-__END__",
 
   parseData: function(d) {
     for( var g in d){
@@ -7330,7 +7330,7 @@ Genoverse.Track.OMIMMorbidmap = Genoverse.Track.extend({
   labels: true,
   repeatLabels: true,
   bump: true,
-  url: "/api/annodb/omimmorbidmap?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/omimmorbidmap/__CHR__:__START__-__END__",
 
   parseData: function(data) {
     for( var i in data) {
@@ -7374,7 +7374,7 @@ Genoverse.Track.DecipherCNV = Genoverse.Track.extend({
   category: "DECIPHER CNVs",
   info: "Copy-number variants observed in other DECIPHER patients",
   tags: ["Patients", "DECIPHER", "Other"],
-  url: "/api/annodb/deciphercnv?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/deciphercnv/__CHR__:__START__-__END__",
   height: 200,
   featureHeight: 6,
   autoheight: true,
@@ -7427,7 +7427,7 @@ Genoverse.Track.ClinVar = Genoverse.Track.extend({
   category: "ClinVar(hg19)",
   info: "ClinVar - aggregates information about genomic variation and its relationship to human health",
   tags: ["ClinVar"],
-  url: "/api/annodb/clinvar?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/clinvar/__CHR__:__START__-__END__",
   xhrFields: {
     withCredentials: !0
   },
@@ -7444,7 +7444,7 @@ Genoverse.Track.ClinVar = Genoverse.Track.extend({
       var start = f.start > this.browser.cnv.start ? f.start : this.browser.cnv.start;
       var end = f.end < this.browser.cnv.end ? f.end : this.browser.cnv.end;
       var percent = (end - start + 1) / (f.end - f.start + 1);
-      console.log(percent)
+      //console.log(percent)
       if ( f.assembly == 'GRCh37' && (
           (this.browser.cnv.gainloss == 'gain' && (f.type == 'copy number gain' || f.type == 'Duplication')) ||
           (this.browser.cnv.gainloss == 'loss' && (f.type == 'copy number loss' || f.type == 'Deletion'))) &&
@@ -7494,7 +7494,7 @@ Genoverse.Track.GeneReview = Genoverse.Track.extend({
   category: "GeneReviews(hg19)",
   info: "GeneReviews - an international point-of-care resource for busy clinicians",
   tags: ["GeneReviews"],
-  url: "/api/annodb/genereview?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/genereview/__CHR__:__START__-__END__",
   xhrFields: {
     withCredentials: !0
   },
@@ -7548,7 +7548,7 @@ Genoverse.Track.DecipherSyndrome = Genoverse.Track.extend({
   category  : 'Decipher Syndrome',
   info      : 'Decipher Syndrome',
   tags      : ['decipher', 'syndrome'],
-  url       : '/api/annodb/deciphersyndrome?chr=__CHR__&start=__START__&end=__END__',
+  url       : '/api/annodb/deciphersyndrome/__CHR__:__START__-__END__',
   height    : 20,
   autoheight  : true,
   hideEmpty   : false,
@@ -7583,7 +7583,7 @@ Genoverse.Track.Pubmed = Genoverse.Track.extend({
   name    : 'Pubmed',
   category: 'Pubmed',
   info    : "Pubmed - CNV diseases related pubmed articles",
-  url    : '/api/annodb/pubmed?chr=__CHR__&start=__START__&end=__END__',
+  url    : '/api/annodb/pubmed/__CHR__:__START__-__END__',
   height  : 50,
   autoHeight  : true,
   hideEmpty   : false,

@@ -11,7 +11,7 @@ Genoverse.Track.OMIMGenemap = Genoverse.Track.extend({
   labels: true,
   repeatLabels: true,
   bump: true,
-  url: "/api/annodb/omimgenemap?chr=__CHR__&start=__START__&end=__END__",
+  url: "/api/annodb/omimgenemap/__CHR__:__START__-__END__",
 
   parseData: function(d) {
     for( var g in d){
