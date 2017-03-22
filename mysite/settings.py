@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'annodb',
     'restful',
     'myQueue',
+    'Xromate',
     #'djcelery',
     #'dbtest',
 ]

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+ 
+{% block title %}学习Xromate{% endblock %}
+
+{% block content %}
+<div class='ui accordion'>
+  <h1 class='ui header title'>
+    <i class='dropdown icon'></i>
+    学习Xromate
+  </h1>
+  <div class="content">
+    <p>学习Xromate分析系统的实现方式。包括登陆系统，分析流程等等内容。</p>
+    <p>这是一个大的耦合的封闭系统，我们把xromate/路由下面的所有东西都包含这个系统下。也就是说，xromate/路由下去实现整个分析系统</p>
+    <p>而/xromate/index是一个指导学习开发的记录页面，用于记录学习开发的过程
+  </div>
+  <div class="ui inverted divider"></div>
+  <h1 class='ui header title'>
+    <i class='dropdown icon'></i>
+    学习开发任务
+  </h1>
+  <div class='content'>
+    <div class='ui ordered list'>
+      <div class='item'>
+        <a class='item'>Xromate数据方面</a>
+        <div class='list'>
+          <a class='item'>用户表用于记录用户的账户信息，和登陆功能相关</a>
+        </div>
+      </div>
+      <div class='item'>
+        <a class='item'>Xromate功能方面</a>
+        <div class='list'>
+          <a class='item'>实现登陆功能,需要和gitlab联动!</a>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+  $('.ui.accordion').accordion({
+    exclusive: false
+  });
+</script>
+{% endblock %}
+ 

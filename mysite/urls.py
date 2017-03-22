@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^myqueue/', include("myQueue.urls")),
     url(r'^api/',include("restful.urls")),
+    url(r'^xromate/', include('Xromate.urls')),
 ]
 
