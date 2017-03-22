@@ -16,12 +16,12 @@ Genoverse.Track.GeneReview = Genoverse.Track.extend({
   repeatLabels  : true,
   bump          : true,
   parseData: function(d) {
-    console.log('genereview gene as below:');
+    //console.log('genereview gene as below:');
     for (var a in d) {
       f = d[a];
       if (f.start < this.browser.cnv.end && f.end > this.browser.cnv.start) {
         f.label = f.gene_symbol;
-        console.log(f);
+        //console.log(f);
         this.insertFeature(f);
       }
     }

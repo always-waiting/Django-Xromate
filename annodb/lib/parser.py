@@ -564,8 +564,7 @@ class ParseGeneReview(object):
         self._data.append(more_data)
 
     def download(self):
-        if self.debug:
-            print "Begin downloading"
+        if self.debug: print "Begin downloading"
         self.ftp.login()
         self.ftp.cwd(self.path)
         self.ftp.retrbinary("RETR " + self.filename , callback=self._handle_binary)

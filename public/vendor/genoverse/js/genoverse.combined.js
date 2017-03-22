@@ -4002,9 +4002,9 @@ Genoverse.Track.Model = Base.extend({
       start = 1;
       end   = this.browser.chromosomeSize;
     }
-    type =　this.browser.cnv.gainloss
-    if (type) {
-      console.log("###############",type)
+    if (this.browser.hasOwnProperty('cnv') && this.browser.cnv.hasOwnProperty('gainloss')){
+      type =　this.browser.cnv.gainloss
+      //console.log("###############",type)
       return (url || this.url).replace(/__ASSEMBLY__/, this.browser.assembly).replace(/__CHR__/, this.browser.chr).replace(/__START__/, start).replace(/__END__/, end).replace(/__TYPE__/, type);
     } else {
       return (url || this.url).replace(/__ASSEMBLY__/, this.browser.assembly).replace(/__CHR__/, this.browser.chr).replace(/__START__/, start).replace(/__END__/, end);
@@ -7512,12 +7512,12 @@ Genoverse.Track.GeneReview = Genoverse.Track.extend({
   repeatLabels  : true,
   bump          : true,
   parseData: function(d) {
-    console.log('genereview gene as below:');
+    //console.log('genereview gene as below:');
     for (var a in d) {
       f = d[a];
       if (f.start < this.browser.cnv.end && f.end > this.browser.cnv.start) {
         f.label = f.gene_symbol;
-        console.log(f);
+        //console.log(f);
         this.insertFeature(f);
       }
     }
