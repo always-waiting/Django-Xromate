@@ -17,11 +17,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from homepage import views as homepage_views
-#from settings import DATABASES
 
-#print "1"*60
-# 不在网站总目录中设定链接数据库，在相应的app下定义
-#dbconnection(DATABASES['annodb']['NAME'])
 
 urlpatterns = [
     url(r'^$',homepage_views.index, name="homepage"),
@@ -31,5 +27,6 @@ urlpatterns = [
     url(r'^myqueue/', include("myQueue.urls")),
     url(r'^api/',include("restful.urls")),
     url(r'^xromate/', include('Xromate.urls')),
+    url(r'login/', include('login.urls')),
 ]
 

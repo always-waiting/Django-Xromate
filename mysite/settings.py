@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'restful',
     'myQueue',
     'Xromate',
+    'login',
     #'djcelery',
     #'dbtest',
 ]
@@ -79,6 +80,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
@@ -159,3 +161,8 @@ LOGGING = {
 }
 
 # 创建一个队列
+# 用github oauth2的配置
+GITHUB_AUTHORIZE_URL = 'https://github.com/login/oauth/authorize'
+GITHUB_CLIENTID = '82650ff1f5010bdd2eb8'
+GITHUB_CLIENTSECRET = '5633680b4be361a815221c465726f0b8c6f63697'
+GITHUB_CALLBACK = 'http://localhost:8000/login/github_auth/'

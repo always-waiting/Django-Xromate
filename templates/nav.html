@@ -12,6 +12,18 @@
         <a class="item">待定</a>
       </div>
     </div>
+    <div class="item" id="userpage">
+      <a>
+        {% if 'username' in request.session %}
+          {{ request.session.username}}
+        {% else %}
+          用户名
+        {% endif %}
+      </a>
+    </div>
+    <div class="item" id="logout">
+      <a href={% url 'web_logout' %}>Logout</a>
+    </div>
   </div>
 </div>
 <script>
