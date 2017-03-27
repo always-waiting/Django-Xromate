@@ -97,7 +97,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.dummy',
         'NAME': 'annodb',
         'HOST': 'mongodb://localhost:27017',
-        'alias': 'default'
+        'alias': 'annodb'
     },
     'xromate': {
         'ENGINE': 'django.db.backends.dummy',
