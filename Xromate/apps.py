@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
 from django.apps import AppConfig
+from mysite.settings import DATABASES
 import re
 
 class XromateConfig(AppConfig):
-    name = 'xromate'
-    db = 'xromate'
-    host = "mongodb://localhost:27017"
-    alias = 'xromate'
+    name = DATABASES['xromate']['NAME']
+    db = DATABASES['xromate']['NAME']
+    host = DATABASES['xromate']['HOST']
+    alias = DATABASES['xromate']['alias']
 
 
 def dumpstring(obj, newline="\n", space="\t", level=0):
