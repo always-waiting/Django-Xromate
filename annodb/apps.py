@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
 from django.apps import AppConfig
+from mysite.settings import DATABASES
 import re
 
 class AnnodbConfig(AppConfig):
-    name = 'annodb'
-    db = 'annodb'
-    host = "mongodb://localhost:27017"
-    alias = 'default'
+    name = DATABASES['annodb']['NAME']
+    db = DATABASES['annodb']['NAME']
+    host = DATABASES['annodb']['HOST']
+    alias = DATABASES['annodb']['alias']
 
 
 def dumpstring(obj, newline="\n", space="\t", level=0):
