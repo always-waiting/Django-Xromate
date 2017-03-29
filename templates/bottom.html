@@ -16,11 +16,13 @@ $('.ui.sticky').sticky({
   if ($body.height() > $container.height()) {
     $body.append(
       //'<div class="ui inverted footer segment" style="position:fixed;left:0;bottom:0;right:0">作者: 秘熙超</div>'
-      '<div class="ui inverted footer segment">作者: 秘熙超</div>'
+      '<div class="ui inverted bottom fixed menu"><div class="item">作者: 秘熙超</div></div>'
     );    
   } else {
     $body.append(
-      '<div class="ui inverted footer segment">作者: 秘熙超</div>'
+      //'<div class="ui inverted footer segment">作者: 秘熙超</div>'
+      '<div class="ui inverted bottom fixed menu"><div class="item">作者: 秘熙超</div></div>'
     );
   }
+  $('.ui.dropdown').dropdown(); 
 </script>

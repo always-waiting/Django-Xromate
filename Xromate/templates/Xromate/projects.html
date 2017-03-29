@@ -1,0 +1,20 @@
+{% extends 'Xromate/base.html'%}
+{% block content%}
+<h1 class='ui header'>Project Type: {{ project }}</h1>
+<table class='ui sortable table'>
+  <thead>
+    <tr>
+      {% for header in headers%}
+      {% if '导入时间' in header %}
+      <th class='default-sort'>{{header}}</th>
+      {% else %}
+      <th>{{header}}</th>
+      {% endif %}
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+{% endblock %}

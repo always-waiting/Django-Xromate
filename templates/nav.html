@@ -1,17 +1,6 @@
 <div class="ui top fixed blue inverted menu">
   <a class="active item" href={% url 'homepage' %}>主页</a>
   <div class="right menu">
-    <div class="ui dropdown item" id="study_list">
-      <a>学习</a>
-      <i class="dropdown icon"></i>
-      <div class="menu">
-        <a class="item" href={% url 'genoverse_index' %}>Genoverse</a>
-        <a class="item" href={% url 'annodb_index'%}>AnnoDB</a>
-        <a class='item' href={% url 'myqueue_index'%}>myQueue</a>
-        <a class='item' href={% url 'xromate_index' %}>Xromate</a>
-        <a class="item">待定</a>
-      </div>
-    </div>
     <div class="item" id="userpage">
       <a>
         {% if 'username' in request.session %}
@@ -21,6 +10,25 @@
         {% endif %}
       </a>
     </div>
+    <div class="ui dropdown item" id='app_list'>
+      <a></a>
+      <i class="dropdown icon"></i>
+      <div class='menu'>
+        <a class='item' href={% url 'xromate_index' %}>Xromate</a>
+        <a class='item' href='/'>Monitor</a>
+      </div>
+    </div>
+    <!--<div class="ui dropdown item" id="study_list">
+      <a></a>
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href={% url 'genoverse_index' %}>Genoverse</a>
+        <a class="item" href={% url 'annodb_index'%}>AnnoDB</a>
+        <a class='item' href={% url 'myqueue_index'%}>myQueue</a>
+        <a class='item' href={% url 'xromate_study_index' %}>Xromate</a>
+        <a class="item">待定</a>
+      </div>
+    </div>-->
     <div class="item" id="logout">
       <a href={% url 'web_logout' %}>Logout</a>
     </div>
@@ -36,5 +44,6 @@
     $('#study_list').children("a").first().text("myQueue");
   } else if (window.location.pathname.match('/xromate/')) {
     $('#study_list').children("a").first().text("Xromate");
+    $('#app_list').children("a").first().text('Xromate')
   }
 </script>
