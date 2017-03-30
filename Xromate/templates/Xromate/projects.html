@@ -14,7 +14,26 @@
     </tr>
   </thead>
   <tbody>
+    {% for flowcell in flowcells %}
+    <tr>
+      <td>{{ flowcell.name }}</td>
+    </tr>
+    {% endfor %}
   </tbody>
 </table>
-
+<div class="pagination" style='margin: 10px auto; text-align: center'>
+  <div class='ui pagination menu'>
+    <a class='item' href="{% url 'xromate_projects' project=project%}?page=1">首页</a>
+    <a class='item' href="{% url 'xromate_projects' project=project%}?page={{pageinfo.current|add:-1}}">上一页</a>
+    {% for i in pageinfo.range %}
+    {% if i == pageinfo.current %}
+    <a class='active teal item' href="{% url 'xromate_projects' project=project%}?page={{i}}">{{i}}</a>
+    {% else %}
+    <a class='item' href="{% url 'xromate_projects' project=project%}?page={{i}}">{{i}}</a>
+    {% endif %}
+    {% endfor %}
+    <a class='item' href="{% url 'xromate_projects' project=project%}?page={{pageinfo.current|add:1}}">下一页</a>
+    <a class='item' href="{% url 'xromate_projects' project=project%}?page={{pageinfo.total}}">末页</a>
+  </div>
+</div>
 {% endblock %}
