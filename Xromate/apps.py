@@ -31,10 +31,18 @@ def dumpstring(obj, newline="\n", space="\t", level=0):
                 string.append("%s%s%s" % ((level+1)*space, v, newline))
         string.append("%s]%s" % (level*space, newline))
     else:
-        strobj = str(obj)
+        if isinstance(obj, str):
+            strobj = obj
+        elif isinstance(obj, unicode):
+            strobj = obj.encode("utf8")
+        else:
+            try:
+                strobj = str(obj)
+            except Exception,e:
+                strobj = "Unknown"
         addlevelobj = re.sub("\n","\n"+level*space, strobj)
-        string.append("%s%s%s" % (level*space, addlevelobj, newline))
-    return "".join(string)
+        string.append(u"%s%s%s" % (level*space, addlevelobj.decode("utf8"), newline))
+    return "".join(string).encode("utf8")
 
 
 
