@@ -15,8 +15,20 @@
   </thead>
   <tbody>
     {% for flowcell in flowcells %}
-    <tr>
-      <td>{{ flowcell.name }}</td>
+    <tr data-flowcell={{flowcell.name}} data-project={{project}}>
+      <td>
+        <a>{{ flowcell.name }}</a>
+        {% if flowcell.newtag %}
+        <a class="ui red label">new</a>
+        {% endif %}
+      </td>
+      <td>{{ flowcell.id.generation_time|date:"Y-m-d H:i:s" }}</td>
+      <td data-url={% url 'xromate_samples_count' project=project flowcell=flowcell.name%}></td>
+      <td data-url='{% url 'xromate_samples_count' project=project flowcell=flowcell.name%}?process__in=[None,&apos;unsubmitted&apos;]'></td>
+      <td data-url="{% url 'xromate_samples_count' project=project flowcell=flowcell.name%}?process=submitted"></td>
+      <td data-url="{% url 'xromate_samples_count' project=project flowcell=flowcell.name%}?process=confirmed"></td>
+      <td data-url="{% url 'xromate_samples_count' project=project flowcell=flowcell.name%}?process=synchronized"></td>
+      <td data-url="{% url 'xromate_samples_count' project=project flowcell=flowcell.name%}?process=rejected"></td>
     </tr>
     {% endfor %}
   </tbody>

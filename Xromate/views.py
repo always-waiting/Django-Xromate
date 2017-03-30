@@ -1,9 +1,11 @@
 # encoding: utf-8
 from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
 from mysite.decorator import login_required
-from models import Flowcells
+from models import Flowcells, Samples, search_samples
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import logging
+import datetime
 
 logger = logging.getLogger('django')
 
@@ -21,13 +23,13 @@ def projects(request, project='CNV'):
         headers = ["Flowcell",u'导入时间', u'总样本数',u'待分析',u'已同步']
     else:
         headers = ['Flowcell', u'导入时间', u'总样本数', u'待分析', u'已提交', u'审核完毕', u'已同步', u'已驳回']
-    flowcells = Flowcells.objects(project=project)
+    flowcells = Flowcells.objects(project=project).order_by("-id")
     paginator = Paginator(flowcells, 25)
     page = request.GET.get('page')
     if page:
         if page == '0': page = 1
         if int(page) > paginator.num_pages: page = paginator.num_pages
-    logger.info("page is: %s" % page)
+    #logger.info("page is: %s" % page)
     pageinfo = {'total': paginator.num_pages}
     try:
         flowcells_show = paginator.page(page)
@@ -56,3 +58,12 @@ def projects(request, project='CNV'):
             'pageinfo' : pageinfo,
         }
     )
+
+def samples_count(request, project, flowcell):
+    query = {'flowcell': flowcell, 'project': project}
+    print request.GET
+    for k, v in request.GET.iteritems():
+        query[k] = v
+    queryset = search_samples(**query)
+    return JsonResponse({'number': queryset.count(),'time':'abc'})
+

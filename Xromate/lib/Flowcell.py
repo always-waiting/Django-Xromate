@@ -4,6 +4,8 @@ Xromate系统flowcell表，用于记录批次信息信息
 """
 import mongoengine as mongoe
 from Xromate.apps import XromateConfig, dumpstring
+import datetime
+#from . import Sample
 
 class Flowcells(mongoe.Document):
     """
@@ -24,3 +26,13 @@ class Flowcells(mongoe.Document):
         string.append("}\n")
         return "".join(string)
 
+    def newflag(self):
+        timenow = datetime.datetime.now()
+        day = (timenow - self.id.generation_time.replace(tzinfo=None)).days
+        if day < 7:
+            return 1
+        else:
+            return 0
+    newtag = property(newflag)
+
+    #samples = mongoe.ListField(mongoe.EmbeddedDocumentField(Sample.Samples))
