@@ -1,0 +1,43 @@
+{% extends 'Xromate/base.html' %}
+{% load xromate %}
+{% block content %}
+<h1 class="ui header">Sample Table</h1>
+<table class="ui celled striped samples sortable table">
+  <thead>
+    <tr class="center aligned">
+      {%for header in headers%}
+      <th>{{header}}</th>
+      {%endfor%}
+    </tr>
+  </thead>
+  <tbody>
+    {%for sample in samples%}
+    <tr class='center aligned sample' data-id={{sample.id}} data-name={{sample.name}}>
+      <td><a>{{sample.name}}</a></td>
+      {% if project == 'MCC' %}
+      <td>{{sample.prediction}}</td>
+      <td>{{sample.result}}</td>
+      <td>{{process2zhcn|get_item:sample.process}}</td>
+      <td>{{sample.handle_time|time_local}}</td>
+      <td class='analyst'>{{sample.analyst_as_text}}</td>
+      {%else%}
+      <td>{{sample.gender|fupper}}</td>
+      <td data-url='{%url 'xromate_sample_cnvs_count' project=project flowcell=flowcell sample=sample.name%}'></td>
+      <td data-url='{%url 'xromate_sample_cnvs_count' project=project flowcell=flowcell sample=sample.name%}?process=submitted'></td>
+      <td data-url='{%url 'xromate_sample_cnvs_count' project=project flowcell=flowcell sample=sample.name%}?process=confirmed'></td>
+      <td class={{process2class|get_item:sample.process}}>{{process2zhcn|get_item:sample.process}}</td>
+      <td>{{sample.result_as_text}}</td>
+      <td>{{sample.report_date|time_local}}</td>
+      <td class="left aligned">{{sample.get_abstract}}</td>
+      <td class='analyst'>{{sample.analyst_as_text}}</td>
+      <td class='auditor'>{{sample.auditor_as_text}}</td>
+      {%endif%}
+    </tr>
+    {%endfor%}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>Total samples: <b>{{samples|length}}</b></th>
+    </tr>
+  </tfoot>
+{% endblock%}

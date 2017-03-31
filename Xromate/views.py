@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from mysite.decorator import login_required
-from models import Flowcells, Samples, search_samples
+from models import Flowcells, Samples, search_samples, search_mccs, search_cnvs
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import logging
 import datetime
@@ -18,7 +18,7 @@ def study_index(request):
 def index(request):
     return render(request, 'Xromate/index.html')
 
-def projects(request, project='CNV'):
+def projects_retrieve(request, project='CNV'):
     if project == 'MCC':
         headers = ["Flowcell",u'导入时间', u'总样本数',u'待分析',u'已同步']
     else:
@@ -61,9 +61,57 @@ def projects(request, project='CNV'):
 
 def samples_count(request, project, flowcell):
     query = {'flowcell': flowcell, 'project': project}
-    print request.GET
     for k, v in request.GET.iteritems():
         query[k] = v
-    queryset = search_samples(**query)
+    if project == 'MCC':
+        queryset = search_mccs(**query)
+    else:
+        queryset = search_samples(**query)
+    #return HttpResponse(queryset.count())
     return JsonResponse({'number': queryset.count(),'time':'abc'})
 
+def projects_flowcells_retrieve(request, project, flowcell):
+    process2zhcn = {
+        'unanalyzed'    : '未分析',
+        'analyzed'      : '已分析',
+        'rejected'      : '已驳回',
+        'confirmed'     : '已审核',
+        'synchronized'  : '已同步',
+        'unsubmitted'   : '未分析',
+        'submitted'     : '已提交',
+    }
+    process2class = {
+        'unsubmitted'   : 'negative',
+        'submitted'     : 'warning',
+        'confirmed'     : 'positive',
+        'rejected'      : 'negative',
+        'synchronized'  : 'positive',
+    }
+    if project == 'MCC':
+        headers = ['样品编号','预测结果','结论','状态','提交时间','分析人']
+        queryset = search_mccs(flowcell=flowcell, project = project)
+        queryset = queryset.order_by('prediction')
+    else:
+        headers = ['样品编号', '性别', '总计', '提交', '确认', '状态', '结论', '报告日期', '简述', '分析人', '审核人']
+        queryset = search_samples(flowcell=flowcell, project=project)
+        queryset = queryset.order_by('name')
+
+    return render(
+        request,
+        'Xromate/projects_flowcells_retrieve.html',
+        {
+            'process2class': process2class,
+            'process2zhcn': process2zhcn,
+            'headers': headers,
+            'samples': queryset,
+            'project': project,
+            'flowcell': flowcell,
+        }
+    )
+
+def sample_cnvs_count(request, project, flowcell, sample):
+    query = {'project': project, 'flowcell': flowcell, 'sample': sample}
+    for k, v in request.GET.iteritems():
+        query[k] = v
+    queryset = search_cnvs(**query)
+    return JsonResponse({'number': queryset.count(),'time':'abc'})

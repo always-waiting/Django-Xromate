@@ -3,8 +3,11 @@
 Xromate系统sample表，用于记录样本信息
 """
 import mongoengine as mongoe
+import pytz
+import re
 from Xromate.apps import XromateConfig, dumpstring
 from . import Flowcell
+from . import User
 from . import Remote
 
 class Samples(mongoe.Document):
@@ -50,3 +53,60 @@ class Samples(mongoe.Document):
             string.append(dumpstring(v, level=2))
         string.append("}\n")
         return "".join(string)
+
+    def result_as_text(self):
+        result2text = {
+            'normal'        : '正常',
+            'polymorphism'  : '多态性',
+            'other'         : '疑似阳性',
+            'unknown'       : '未知',
+            'exception'     : '异常',
+            'degradation'   : 'DNA降解',
+            'contamination' : '母源污染',
+            'backdrop'      : '背景高',
+            'rebuild'       : '重建库',
+            'resequence'    : '重上机',
+            'noreport'      : '不出报告',
+            'nothing'       : '无结果',
+            'haploid'       : '单倍体',
+            'triploid'      : '三整倍体',
+            'tetraploid'    : '四整倍体',
+            'singlediploid' : '单亲二倍体',
+        }
+        if self.result:
+            return result2text[self.result]
+        return ""
+
+    def report_date(self):
+        if self.sync_time:
+            return self.sync_time
+        elif self.confirm_time:
+            return self.confirm_time
+        elif self.submit_time:
+            return self.confirm_time
+        return ""
+
+    def get_abstract(self):
+        if self.abstract:
+            return self.abstract
+        else:
+            if self.remote:
+                abstract = self.remote.karyotype
+                if abstract:
+                    return re.sub(".*\:|。","", abstract)
+                else:
+                    return ""
+
+    def auditor_as_text(self):
+        try:
+            user = User.Users.objects.get(username=self.auditor)
+            return user.name
+        except User.Users.DoesNotExist:
+            return ''
+
+    def analyst_as_text(self):
+        try:
+            user = User.Users.objects.get(username=self.analyst)
+            return user.name
+        except User.Users.DoesNotExist:
+            return ''

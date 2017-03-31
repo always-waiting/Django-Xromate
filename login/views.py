@@ -7,7 +7,7 @@ import json
 from django.http import HttpResponseRedirect,HttpResponse
 from mysite import settings
 from django.core.urlresolvers import reverse
-from Xromate.lib.User import User
+from Xromate.lib.User import Users
 import logging
 
 logger = logging.getLogger('django')
@@ -93,9 +93,9 @@ def gitlab_auth(request):
     if back_path.startswith('/xromate'):
         #向Xromate数据库查询用户，如果没有，添加用户．如果存在，目前什么也不做
         try:
-            user = User.objects.get(username=data['username'])
-        except User.DoesNotExist:
-            user = User.objects.create(username = data['username'])
+            user = Users.objects.get(username=data['username'])
+        except Users.DoesNotExist:
+            user = Users.objects.create(username = data['username'])
             user.save()
     elif back_path.startswith('/monitor'):
         '''

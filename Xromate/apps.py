@@ -17,7 +17,7 @@ def dumpstring(obj, newline="\n", space="\t", level=0):
         string.append("%s{%s" % (level*space, newline))
         for k, v in obj.items():
             if hasattr(v, '__iter__'):
-                string.append("%s%s =>%s" % ((level+1)*space, k, newline))
+                string.append(u"%s%s =>%s" % ((level+1)*space, k, newline))
                 string.append(dumpstring(v, level = level+1))
             else:
                 string.append("%s%s => %s%s" % ((level+1)*space, k, v, newline))
@@ -28,7 +28,7 @@ def dumpstring(obj, newline="\n", space="\t", level=0):
             if hasattr(v, '__iter__'):
                 string.append(dumpstring(v, level = level+1))
             else:
-                string.append("%s%s%s" % ((level+1)*space, v, newline))
+                string.append(u"%s%s%s" % ((level+1)*space, v, newline))
         string.append("%s]%s" % (level*space, newline))
     else:
         if isinstance(obj, str):
@@ -42,7 +42,10 @@ def dumpstring(obj, newline="\n", space="\t", level=0):
                 strobj = "Unknown"
         addlevelobj = re.sub("\n","\n"+level*space, strobj)
         string.append(u"%s%s%s" % (level*space, addlevelobj.decode("utf8"), newline))
-    return "".join(string).encode("utf8")
+    try:
+        return "".join(string).encode("utf8")
+    except Exception:
+        return "".join(string)
 
 
 
