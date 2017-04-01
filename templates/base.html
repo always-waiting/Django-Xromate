@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load xromate%}
 <html>
   <head>
         <title>mysite - {% block title %}默认标题{% endblock %}</title>
@@ -9,7 +10,7 @@
         <script src="/static/vendor/semantic/semantic.min.js"></script>
         {% block header%} {% endblock %}
   </head>
-  <body>
+  <body {% body_data_generation %}>
     {% block nav %}{% include 'nav.html' %}{% endblock %}
     
     <div class="ui container" style="margin: 60px 0px 60px 0px"> 

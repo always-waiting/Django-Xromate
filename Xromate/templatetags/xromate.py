@@ -30,7 +30,17 @@ def time_local(value):
     else:
         return ""
 
-#@register.filter
-#def len(value):
 
+@register.simple_tag(takes_context=True)
+def body_data_generation(context):
+    relist = []
+    if 'username' in context:
+        relist.append("data-username=%s" % context['username'])
+    if 'project' in context and context['project']:
+        relist.append("data-project=%s" % context['project'])
+    if 'flowcell' in context and context['flowcell']:
+        relist.append("data-flowcell=%s" % context['flowcell'])
+    if 'sample' in context and context['sample']:
+        relist.append("data-sample=%s" % context['sample'])
+    return ' '.join(relist)
 

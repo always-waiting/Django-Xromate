@@ -2,13 +2,11 @@
   <a class="active item" href={% url 'homepage' %}>主页</a>
   <div class="right menu">
     <div class="item" id="userpage">
-      <a>
-        {% if 'username' in request.session %}
-          {{ request.session.username}}
-        {% else %}
-          用户名
-        {% endif %}
-      </a>
+      {% if username %}
+      <a>{{ username }}</a>
+      {% else %}
+      <a>用户名</a>
+      {% endif %}
     </div>
     <div class="ui dropdown item" id='app_list'>
       <a></a>

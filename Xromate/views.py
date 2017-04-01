@@ -52,7 +52,6 @@ def projects_retrieve(request, project='CNV'):
         'Xromate/projects.html',
         {
             'test': '这是一个测试',
-            'project': project,
             'headers': headers,
             'flowcells': flowcells_show,
             'pageinfo' : pageinfo,
@@ -104,8 +103,6 @@ def projects_flowcells_retrieve(request, project, flowcell):
             'process2zhcn': process2zhcn,
             'headers': headers,
             'samples': queryset,
-            'project': project,
-            'flowcell': flowcell,
         }
     )
 
