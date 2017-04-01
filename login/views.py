@@ -94,8 +94,10 @@ def gitlab_auth(request):
         #向Xromate数据库查询用户，如果没有，添加用户．如果存在，目前什么也不做
         try:
             user = Users.objects.get(username=data['username'])
+            user.update(access_token=access_token)
+            user.save()
         except Users.DoesNotExist:
-            user = Users.objects.create(username = data['username'])
+            user = Users.objects.create(username = data['username'], access_token=access_token)
             user.save()
     elif back_path.startswith('/monitor'):
         '''

@@ -47,6 +47,7 @@ semantic.ready = function() {
 
 $(document).ready(function() {
   $('.top.menu').xromatenav() 
+  $('.samples').samples()
   $('.ui.dropdown').dropdown()
   semantic.ready()
 })

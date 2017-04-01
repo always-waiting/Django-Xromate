@@ -2,8 +2,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from mysite.decorator import login_required
-from models import Flowcells, Samples, search_samples, search_mccs, search_cnvs
+from models import Flowcells, Samples, search_samples, search_mccs, search_cnvs, Users
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import json
 import logging
 import datetime
 
@@ -112,3 +113,22 @@ def sample_cnvs_count(request, project, flowcell, sample):
         query[k] = v
     queryset = search_cnvs(**query)
     return JsonResponse({'number': queryset.count(),'time':'abc'})
+
+def profile(request):
+    fieldstr = request.GET.get('fields')
+    if fieldstr:
+        fields = fieldstr.split(",")
+        try:
+            user = Users.objects.get(username = request.session['username'])
+        except KeyError,e:
+            return JsonResponse({'error': "KeyError: %s" % e})
+        except Exception,e:
+            return JsonResponse({'error': "Unknown Error: %s" % e})
+        retjson = { field: getattr(user, field) for field in fields if hasattr(user, field)}
+        return JsonResponse(retjson)
+    else:
+        return JsonResponse({'error': "not fields to search"})
+
+
+def users_retrieve(request):
+    return JsonResponse(json.loads(Users.objects().to_json()), safe=False)
