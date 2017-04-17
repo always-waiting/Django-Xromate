@@ -1,0 +1,23 @@
+{% extends 'Xromate/base.html' %}
+{%load xromate%}
+{%block leftnav%}
+{%include 'Xromate/sample_leftnav.html'%}
+{%endblock%}
+{% block content%}
+{% for i in output%}
+<div class="ui hidden divider" id="{{i.chrom}}loc"></div>
+<div class="ui hidden divider"></div>
+<div class='ui chromosome segment' data-chromosome={{i.chrom}} data-cnv='{{i|get_item:'cnvs'|to_json}}' data-mosaic='{{i|get_item:'mosaic'|to_json}}'>
+  <h2 class='ui red header'>
+    <div  class='content'>
+      Chromosome {{i.chrom}}
+      <div class='sub header'></div>
+    </div>
+  </h2>
+  <h4 class='ui teal horizontal header clearing divider'>Chromosome Image</h4>
+  <img class="ui centered image" src='{{i.image}}.json'>
+  <h4 class='ui teal horizontal header clearing divider'>CNV List</h4>
+  {%include 'Xromate/cnv_table.html' with chrom=i.chrom cnvs=i.cnvs%}
+</div>
+{%endfor%}
+{%endblock%}

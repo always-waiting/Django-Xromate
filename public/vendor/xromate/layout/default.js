@@ -32,7 +32,8 @@ semantic.ready = function() {
           on: 'now',
           url: v.data().url,
           onSuccess: function (data){
-            $(this).html(data.number);
+            console.log(data)
+            $(this).html(data);
             if (v.hasClass('label')) {
               if (data) {
                 v.addClass('teal');

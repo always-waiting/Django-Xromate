@@ -72,7 +72,7 @@
         }, // initialize done
         bind: {
           events: function() {
-            module.verbose('Binding events', $analyst);
+            //module.verbose('Binding events', $analyst);
             $samples.each(function (index, sample) {
               var 
                 $sample = $(sample),
@@ -84,13 +84,13 @@
                 var defaultText = $(this).text();
                 var $chooser = module.create.users.chooser('analyst');
                 $chooser.dropdown({
-                  apiSettings: {
-                    url: '/users/search?q={query}'
-                  },
+                  //apiSettings: {//貌似没有用，实现后删除看看有什么效果
+                  //  url: '/xromate/users/search?q={query}'
+                  //},
                   onChange: function (value, text, $choice) {
                     if (value && text != defaultText) {
                       $sample.api({
-                        url: location.pathname + '/samples/' + $sample.data('name'),
+                        url: location.pathname + 'samples/' + $sample.data('name'),
                         method: 'PATCH',
                         data: {
                           analyst: value
@@ -100,10 +100,84 @@
                     }
                   }
                 });
-              })
-            })
+                if ($chooser.dropdown('get item', defaultText)) {
+                  $chooser.dropdown('set selected', defaultText);
+                } else {
+                  $chooser.dropdown('set text', defaultText);  
+                }
+                $(this).empty().append($chooser);
+              });
+              $auditor.each(function() {
+                var defaultText = $(this).text();
+                var $chooser = module.create.users.chooser('auditor');
+                $chooser.dropdown({
+                  onChange: function (value, text, $choice) {
+                    if (value && text != defaultText) {
+                      $sample.api({
+                        url: location.pathname + 'samples/' + $sample.data('name'),
+                        method: 'PATCH',
+                        data:{
+                          auditor: value
+                        },
+                        on: 'now',
+                        //onSuccess: function(data) {
+                        //  defaultText = value;
+                        //}
+                      })
+                    }
+                  }
+                })
+                if ($chooser.dropdown('get item', defaultText)) {
+                  $chooser.dropdown('set selected', defaultText);
+                } else {
+                  $chooser.dropdown('set text', defaultText);  
+                }
+                //$chooser.dropdown('set selected', defaultText);
+                $(this).empty().append($chooser);
+              });
+            });
           },// bind.events done
         }, // bind done
+        get: {
+          users: function(query) {
+            if (settings.variables.users === null) {
+              $.api({
+                url: '/xromate/users',
+                on : 'now',
+                onSuccess: function(response) {
+                  module.verbose('Got users', response);
+                  settings.variables.users = response;
+                }
+              });
+            }
+            return settings.variables.users;
+          }   
+        },
+        create: {
+          users: {
+            chooser: function(target, select) {
+              var
+                users = module.get.users(),
+                $chooser = $('<div class="ui tiny search selection dropdown"></div>')
+                  .append('<input type="hidden" name="' + target + '">')
+                  .append('<i class="dropdown icon"></i>')
+                  .append('<input class="tiny search" tabindex="0">')
+                  .append('<div class="default text">Select User</div>')
+                  .append('<div class="menu" tabindex="-1"></div>'),
+                $selection = $chooser.find('.menu')
+              ;
+              if (usersChooserDisabled) {
+                $chooser.addClass('disabled');
+              }
+              users.filter(function(user) {
+                return user.state === 'active';
+              }).map(function(user){
+                $('<div class="item" data-value="' + user.username + '"></div>').html(user.name || user.username).appendTo($selection);
+              });
+              return $chooser;
+            }  
+          }  
+        },
         debug: function() {
           if(settings.debug) {
             if(settings.performance) {

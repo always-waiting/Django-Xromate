@@ -35,6 +35,7 @@ class Cnvs(mongoe.Document):
     cytoband = mongoe.StringField()
     sample = mongoe.ReferenceField(Sample.Samples, dbref=True, reverse_delete_rule=2)
     state = mongoe.StringField()
+    auditor = mongoe.StringField()
 
     def __str__(self):
         string = ["{\n"]
@@ -43,3 +44,8 @@ class Cnvs(mongoe.Document):
             string.append(dumpstring(v, level=2))
         string.append("}\n")
         return "".join(string)
+
+    def search_logs(self, **opt):
+        from . import Log
+        logsqueryset = Log.Logs.objects(__raw__={'cnv.$id': self.id}, **opt)
+        return logsqueryset

@@ -4,6 +4,9 @@ Xromate系统remote表,用于记录远程信息
 """
 import mongoengine as mongoe
 from Xromate.apps import XromateConfig, dumpstring
+import urllib2
+import urllib
+import json
 
 class Remotes(mongoe.Document):
     """
@@ -87,6 +90,25 @@ class Remotes(mongoe.Document):
     #
     sample = mongoe.DictField()
 
+    def get_remote(self):
+        data = json.dumps({'caseid': self.caseid})
+        url = XromateConfig.remote_get_url
+        headers = {'Content-Type': 'application/json'}
+        req = urllib2.Request(url, data, headers)
+        response = urllib2.urlopen(req)
+        result = json.loads(response.read())
+        result['datatype'] = result['data']
+        if result['casesize'] == 'false':
+            result['casesize'] = False
+        else:
+            result['casesize'] = True
+        del result['data']
+        return result
+
+    def pull(self):
+        new = self.get_remote()
+        self.update(**new)
+        self.reload()
 
 
     def __str__(self):

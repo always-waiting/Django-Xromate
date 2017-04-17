@@ -1,0 +1,10 @@
+{% load xromate %}
+<h2 class="ui dividing header">基本信息</h2>
+<table class="ui definition table">
+  {% to_list 'No.' 'Case ID' 'Gender' 'Total Reads' 'Unique Reads' 'PCR Duplication' 'Unique Percentage' 'Unique GC Content' 'Redundancy' 'NIPT Comment' 'MCC Result' as dataheader%}
+  <tbody>
+  {%for k in dataheader%}
+    <tr><td>{{k}}</td><td>{{baseinfo|get_item:k}}</td></tr>
+  {%endfor%}
+  </tbody>
+</table>

@@ -1,0 +1,218 @@
+{%load xromate%}
+{%to_list '' '男' '女' as sex_list%}
+{%to_list '空' '产前检测' '流产物检测' '患者检测' as casetype_list%}
+{%to_list '' '正常' '异常' '未知' '多态性' 'DNA降解' '母源污染' '测序背景高' as samplestatus_list%}
+{%to_list '' '有' '无' as yesno_list%}
+{%to_list '' '未见异常' '胎儿结构异常' '软指标高风险' '介入性手术治疗' '其他' as sound%}
+{%to_list '' '已做' '未做' as done_list%}
+{%to_list '' '是' '否' as shifou_list%}
+<h2 class="ui header">远程报告内容
+  <div class="ui remote right floated teal button">
+    更新远程信息
+  </div>
+</h2>
+<div>
+  <div class="ui hidden divider"></div>
+  <h3 class="ui header">1. 基本信息</h3>
+  <div class="ui divider"></div>
+  <table class="ui definition table">
+    <thead><tr><th class="two wide"></th><th></th></tr></thead>
+    <tbody>
+{%to_dict name='姓名' age='年龄' sex='检测性别' clientsex='录入性别' datatype='送检材料' hospital='送检医院' sendpersontext='特殊情况说明' sourcedoctor='送检医生' sampleDate='采样日期' reportDate='报告日期' samplestatus='样品状态' location='坐标' resultexp='结果解释' karyotype='核型' sibcheck='亲属检测' sibnumber='检测编号' sibname='亲属姓名' sibrelation='亲属关系' casetype='样品类型' as basics%}
+{%to_list 'name' 'age' 'sex' 'clientsex' 'datatype' 'hospital' 'sendpersontext' 'sourcedoctor' 'sampleDate' 'reportDate' 'samplestatus' 'location' 'resultexp' 'karyotype' 'sibcheck' 'sibnumber' 'sibname' 'sibrelation' 'casetype' as basics_header%}
+      {%for k in basics_header%}
+      <tr>
+        <td> {{basics|get_item:k}} </td>
+        {%with content=remoteinfo|get_item:k %}
+          {%if k == 'sex' and content %}
+        <td class={{k}}>{{sex_list|get_item:content}}</td>
+          {%elif k == 'samplestatus' and content%}
+        <td class={{k}}>{{samplestatus_list|get_item:content}}</td>
+          {%elif k == 'location' or k == 'resultexp'%}
+        <td class={{k}}>{{content|linebreaks}}</td>
+          {%elif k == 'casetype'%}
+        <td class={{k}}>{{casetype_list|get_item:content}}</td>
+          {%elif k == 'sibcheck'%}
+            {%if content == 1 or content == '1'%}
+        <td class={{k}}>已做</td>
+            {%elif content%}
+        <td class={{k}}>未做</td>
+            {%else%}
+        <td class={{k}}></td>
+            {%endif%}
+          {%else%}
+        <td class = {{k}}> {{content}} </td>
+          {%endif%}
+        {%endwith%}
+      </tr>
+      {%endfor%}
+    </tbody>
+  </table>
+
+  <div class="ui hidden divider"></div>
+  <h3 class="ui dividing header">2. 孕产史</h3>
+  <table class="ui definition table">
+    <thead><tr><th class="two wide"></th><th></th></tr></thead>
+    <tbody>
+{%to_dict historybir='不良孕产史' historybirtext='不良孕产史内容' pregnantnum='怀孕次数' geneticdispre='家族遗传病' geneticdispretext='遗传病内容' birthnum='孕产次数' chromtype='夫妻染色体核型' karyomemo='染色体核型内容' as pregnacy%}
+{%to_list 'historybir' 'historybirtext' 'pregnantnum' 'geneticdispre' 'geneticdispretext' 'birthnum' 'chromtype' 'karyomemo' as pregnacy_header%}
+      {%for k in pregnacy_header%}
+      <tr>
+        <td>{{pregnacy|get_item:k}}</td>
+        {%with content=remoteinfo|get_item:k%}
+          {%if k == 'historybir' or k == 'geneticdispre'%}
+        <td class={{k}}>{{yesno_list|get_item:content}}</td>
+          {%else%}
+        <td class={{k}}>{{content}}</td>
+          {%endif%}
+        {%endwith%}
+      </tr>
+      {%endfor%}
+    </tbody>
+  </table>
+
+  <div class="ui hidden divider"></div>
+  <h3 class="ui dividing header">3. 产前检查</h3>
+  <table class="ui definition table">
+    <thead><tr><th class="two wide"></th><th></th></tr></thead>
+    <tbody>
+{%to_dict pregweek='孕周' pregday='孕天' lastmenses='末次月经' mensesperiod='月经周期' ultrasound='超声检查' bloodcheck='血清筛查' diagnoses='产前诊断' diagnosestext='诊断结果' threesyd='21三体' eighteensyd='18三体' otherexplain='其他特殊情况' as examination%}
+{%to_list 'pregweek' 'pregday' 'lastmenses' 'mensesperiod' 'ultrasound' 'bloodcheck' 'diagnoses' 'diagnosestext' 'threesyd' 'eighteensyd' 'otherexplain' as examination_header%}
+      {%for k in examination_header%}
+      <tr>
+        <td>{{examination|get_item:k}}</td>
+        {%with content=remoteinfo|get_item:k%}
+          {% if k == 'ultrasound'%}
+        <td class={{k}}>{{content|parse_ultrasound:sampledoc}}</td>
+          {%elif k == 'bloodcheck' or k == 'diagnoses'%}
+        <td class={{k}}>{{yesno_list|get_item:content}}</td>
+          {%else%}
+        <td class={{k}}>{{content}}</td>
+          {%endif%}
+        {%endwith%}
+      </tr>
+      {%endfor%}
+    </tbody>
+  </table>
+
+  <div class="ui hidden divider"></div>
+  <h3 class="ui dividing header">4. 患者信息</h3>
+  <table class="ui definition table">
+    <thead><tr><th class="two wide"></th><th></th></tr></thead>
+    <tbody>
+{%to_dict sickphenop='病状信息' geneticdispro='家族遗传病' geneticdisprotext='遗传病详细' otherdia='其他诊断' diagnosesitem='诊断项目' diagnosesresult='诊断结果' clinicinfor='其他临床信息' othersickphenop='患者信息其他详细' as  clinical%}
+{%to_list 'sickphenop' 'geneticdispro' 'geneticdisprotext' 'otherdia' 'diagnosesitem' 'diagnosesresult' 'clinicinfor' 'othersickphenop' as clinical_header%}
+      {%for k in clinical_header%}
+      <tr>
+        <td>{{clinical|get_item:k}}</td>
+        {%with content=remoteinfo|get_item:k%}
+          {%if k == 'otherdia'%}
+        <td class={{k}}>{{done_list|get_item:content}}</td>
+          {%elif k == 'sickphenop'%}
+          {% autoescape off %}
+        <td class={{k}}>{{content|parse_sickphenop:sampledoc}}</td>
+          {% endautoescape %}
+          {%elif k == 'geneticdispro'%}
+        <td class={{k}}>{{shifou_list|get_item:content}}</td>
+          {%else%}
+        <td class={{k}}>{{content}}</td>
+          {%endif%}
+        {%endwith%}
+      </tr>
+      {%endfor%}
+    </tbody>
+  </table>
+</div>
+
+
+
+
+<script>
+$(document).ready(function(){
+  function process_sickphenop (code, othersickphenop) {
+    var code2des = ['空', '智力障碍', '特殊面容', '先天性心脏病', '发育迟缓', '肌无力', '肢体畸形', '脏器畸形', '自闭症', '生殖系统畸形', '其他/'];
+    code = code ||'';
+    var codes = code.split(";");
+    code2des[10] += ":" + othersickphenop;
+    var out = new Array();
+    for (index in codes) {
+      out.push(code2des[codes[index]]);
+    }
+    return out;
+  }
+  $('.remote.button').api({
+    url           : "{%url 'xromate_project_flowcell_sample_remote_retrieve' project=project flowcell=flowcell sample=sample%}",
+    stateContext  : '.remote.button',
+    method        : 'PUT',
+    debug         : true,
+    onSuccess     : function(data) {
+      var sex = ['男', '女'];
+      var yesno = ['有', '无'];
+      var shifou = ['是', '否'];
+      var casetype = ['空', '产前检测', '流产物检测', '患者检测'];
+      var samplestatus = ['正常', '异常', '未知', '多态性', 'DNA降解', '母源污染', '测序背景高'];
+      var done = ['已做', '未做'];
+      var sound = ['未见异常', '胎儿结构异常' ,'软指标高风险', '介入性手术治疗', '其他'];
+      var exception = ['未见异常', '提示异常'];
+      //console.log(data)
+      for (var key in data) {
+        var value = data[key] || '';
+        console.log("key:"+key);
+        console.log("value:"+value);
+        var content = '';
+        if (key === 'sex') {
+          content = sex[value - 1];
+        } else if (key === 'samplestatus' && value) {
+          content = samplestatus[value - 1];
+          $("."+key).text(content);
+        } else if (key.match(/location|resultexp/)) {
+          content = value;
+          content.replace(/\r?\n/g, "<br/>");
+          $("."+key).html(content);
+        } else if (key === 'casetype') {
+          value = (value == '' ? 0 : value);
+          $("."+key).text(casetype[value]);
+        } else if (key === 'sibcheck') {
+          $("."+key).text(value == 1 ? '已做' : '未做');
+        } else if (key.match(/^historybir|geneticdispre$/) && value) {
+          $("."+key).text(yesno[value-1]);
+        } else if (key === 'ultrasound' && value) {
+          var items = value.split(",");
+          //console.log("ultrasound:" + key + ":" + items);
+          for (var i in items) {
+            if (items[i].match(/1|2|3|4|5/)) {
+              //console.log(i+'#######'+items[i]);
+              content += items[i] + "." + sound[items[i]-1] + ':';
+              var ultrasoundtext = 'ultrasoundtext' + (items[i] == 1 ? '' : items[i] - 1);
+              if (data[ultrasoundtext]) {
+                content += data[ultrasoundtext] + "<br/>";
+              }
+            } else {
+              content = "远程sound字段内容为:" + value;
+            }
+          }
+          $("."+key).html(content);
+        } else if (key == 'bloodcheck' || key == 'diagnoses') {
+          content = yesno[value-1];
+          $("."+key).text(content);
+        } else if (key === 'sickphenop') {
+          out = process_sickphenop(data[key], data['othersickphenop']);
+          content += '<div class="ui bulleted list">';
+          for (i in out) {
+            content += '<div class="item">' + out[i] + "</div>";
+          }
+          content += '</div>';
+          $("."+key).html(content);
+        } else if (key == 'geneticdispro' && value) {
+          content += shifou[value-1];
+          $("."+key).text(content);
+        } else {
+          $("."+key).text(value);
+        }
+      }
+    },
+    onFailure     : function(data) { alert("onFailure")},
+    onError       : function(data) { alert("onError")},
+  });
+})
+</script>

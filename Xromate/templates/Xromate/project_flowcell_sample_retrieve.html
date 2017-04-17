@@ -1,0 +1,14 @@
+{% extends 'Xromate/base.html' %}
+{% load xromate %}
+{%block leftnav%}
+{%include 'Xromate/sample_leftnav.html'%}
+{%endblock%}
+{%block content%}
+{%include 'Xromate/form_report.html'%}
+<div class="ui hidden divider"></div>
+{%include 'Xromate/reject_report.html'%}
+<div class="ui hidden divider"></div>
+{%include 'Xromate/sample_basic_information.html'%}
+<div class="ui hidden divider"></div>
+{%include 'Xromate/remote_report.html'%}
+{%endblock%}

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'myQueue',
     'Xromate',
     'login',
+    'rest_framework',
     #'djcelery',
     #'dbtest',
 ]
@@ -104,7 +105,7 @@ DATABASES = {
     },
     'xromate': {
         'ENGINE': 'django.db.backends.dummy',
-        'NAME': 'xromate',
+        'NAME': 'xromate_example',
         'HOST': 'mongodb://localhost:27017',
         'alias': 'xromate'
     }

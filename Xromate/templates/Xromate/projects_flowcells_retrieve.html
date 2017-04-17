@@ -13,7 +13,7 @@
   <tbody>
     {%for sample in samples%}
     <tr class='center aligned sample' data-id={{sample.id}} data-name={{sample.name}}>
-      <td><a>{{sample.name}}</a></td>
+      <td><a href={% url 'xromate_projects_flowcells_samples_retrieve' project=project flowcell=flowcell sample=sample.name %}>{{sample.name}}</a></td>
       {% if project == 'MCC' %}
       <td>{{sample.prediction}}</td>
       <td>{{sample.result}}</td>

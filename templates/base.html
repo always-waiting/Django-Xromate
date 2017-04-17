@@ -12,7 +12,7 @@
   </head>
   <body {% body_data_generation %}>
     {% block nav %}{% include 'nav.html' %}{% endblock %}
-    
+    {% block leftnav %}{%endblock%} 
     <div class="ui container" style="margin: 60px 0px 60px 0px"> 
       {% block content %}
       <div>这里是默认内容，所有继承自这个模板的，如果不覆盖就显示这里的默认内容。</div>

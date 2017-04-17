@@ -2,6 +2,12 @@ from __future__ import unicode_literals
 
 from django.apps import AppConfig
 from mysite.settings import DATABASES
+try:
+    from mysite.settings import PNG_WEB_DIR
+    png_dir_flag = 1
+except Exception,e:
+    print "You shold defined PNG_WEB_DIR in your settings files"
+    png_dir_flag = 0
 import re
 
 class XromateConfig(AppConfig):
@@ -9,7 +15,9 @@ class XromateConfig(AppConfig):
     db = DATABASES['xromate']['NAME']
     host = DATABASES['xromate']['HOST']
     alias = DATABASES['xromate']['alias']
-
+    remote_get_url = 'http://192.168.21.224/berry/Jrest/cnvService/getBerrygenomics'
+    remote_put_url = 'http://192.168.21.224/berry/Jrest/cnvService/addBerrygenomics'
+    png_dir = PNG_WEB_DIR if png_dir_flag else "/data/PNG_WEB"
 
 def dumpstring(obj, newline="\n", space="\t", level=0):
     string = []

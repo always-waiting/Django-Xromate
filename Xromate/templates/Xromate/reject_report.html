@@ -1,0 +1,17 @@
+{%load xromate%}
+<h2 class="ui dividing header">驳回记录</h2>
+<table class='ui celled structured teal table'>
+  <thead>
+    <tr>
+      <th class='center aligned'>Time</th>
+      <th class='center aligned' colspan='2'>Rejected CNVs</th>
+      <th class='center aligned'>Rejected reason</th>
+      <th class='center aligned'>Auditor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% autoescape off%}
+    {% reject_list %}
+    {% endautoescape %}
+  </tbody>
+</table>

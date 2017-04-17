@@ -1,0 +1,34 @@
+<!--<div class="ui left sticky vertical menu" id="chromosomes" style="margin: 0px 10px 0px 20px;float:left">-->
+<div class="ui left fixed vertical menu" id="chromosomes" style="margin: 50px 10px 0px 20px;">
+  <a class='item' href={%url 'xromate_projects_retrieve' project=project %}>Project: <b>CNV</b></a>
+  <a class='item' href={%url 'xromate_projects_flowcells_retrieve' project=project flowcell=flowcell%}>Flowcell: <b>{{flowcell|truncatechars:20}}</b></a>
+  <a class='item' href={%url 'xromate_projects_flowcells_samples_retrieve' project=project flowcell=flowcell sample=sample%}>
+    <div class="header">Sample: {{sample}}</div>
+    <div class="description">
+      <div class="ui tiny labels">
+        <div class="ui purple label">{{sampledoc.gender|default_if_none:"Gender Unknown"|title}}</div>
+        <div class="ui red label">{{sampledoc.remote.mcc|default_if_none:"No MCC"}}</div>
+        <div class="ui teal label">
+          {% if sampledoc.summary%}
+          {{sampledoc.summary.nipt_comment}}
+          {%else%}
+          No NIPT
+          {%endif%}
+        </div>
+      </div>
+    </div>
+  </a>
+  <div class = 'item menu'>
+    Chromosome List
+    {% for i in chromlist%}
+    <a class="item" href="{%url 'xromate_project_flowcell_sample_chromosomes_list' project=project flowcell=flowcell sample=sample%}#{{i}}loc">
+      <div class='ui label' data-url="{% url 'xromate_sample_cnvs_count' project=project flowcell=flowcell sample=sample%}?chr={{i}}">0</div>Chr {{i}}
+    </a>
+    {%endfor%}
+  </div>
+</div>
+<script>
+$('.ui.sticky').sticky({
+  context: '#chromosomes'
+});
+</script>

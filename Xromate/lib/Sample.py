@@ -110,3 +110,13 @@ class Samples(mongoe.Document):
             return user.name
         except User.Users.DoesNotExist:
             return ''
+
+    def search_logs(self,**opt):
+        from . import Log
+        logqueryset = Log.Logs.objects(__raw__ = {'sample.$id': self.id}, **opt)
+        return logqueryset
+
+    def search_cnvs(self, **opt):
+        from . import CNV
+        cnvsqueryset = CNV.Cnvs.objects(__raw__ = {'sample.$id': self.id}, **opt)
+        return cnvsqueryset
