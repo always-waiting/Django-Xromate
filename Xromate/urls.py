@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^projects/(?P<project>[^/]+)/flowcells/(?P<flowcell>[^/]+)/samples/(?P<sample>[^/]+)/remotes/remote$', views.project_flowcell_sample_remote_retrieve, name='xromate_project_flowcell_sample_remote_retrieve'),
     url(r'^projects/(?P<project>[^/]+)/flowcells/(?P<flowcell>[^/]+)/samples/(?P<sample>[^/]+)/chromosomes$', views.project_flowcell_sample_chromosomes_list, name='xromate_project_flowcell_sample_chromosomes_list'),
     url(r'^projects/(?P<project>[^/]+)/flowcells/(?P<flowcell>[^/]+)/samples/(?P<sample>[^/]+)/chromosomes/(?P<chrom>[^/.]+)(?:.(?P<format>[a-zA-Z]+))?$', views.project_flowcell_sample_chromosome_retrieve, name='xromate_project_flowcell_sample_chromosome_retrieve'),
+    url(r'^projects/(?P<project>[^/]+)/flowcells/(?P<flowcell>[^/]+)/samples/(?P<sample>[^/]+)/cnv/(?P<cnv>[^/.]+)$', views.project_flowcell_sample_cnv_retrieve, name='xromate_project_flowcell_sample_cnv_retrieve'),
 ]
 
 

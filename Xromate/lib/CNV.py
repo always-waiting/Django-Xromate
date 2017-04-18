@@ -49,3 +49,8 @@ class Cnvs(mongoe.Document):
         from . import Log
         logsqueryset = Log.Logs.objects(__raw__={'cnv.$id': self.id}, **opt)
         return logsqueryset
+
+    @property
+    def location(self):
+        return "%s:%s-%s" % (self.chr, self.start, self.end)
+

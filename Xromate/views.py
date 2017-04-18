@@ -222,21 +222,22 @@ def project_flowcell_sample_chromosomes_list(request, project, flowcell, sample)
 
 #@api_view(['GET'])
 def project_flowcell_sample_chromosome_retrieve(request, project, flowcell, sample, chrom, format=None):
-    #logger.info(format)
-    #logger.info(chrom)
-    #return HttpResponse("开发获得图片url")
-    filedir = "%s/%s/%s/SAMPLE-PNG/" % (XromateConfig.png_dir, project, flowcell)
-    try:
-        files = os.listdir(filedir)
-    except Exception,e:
-        logger.info(filedir)
-        return HttpResponse(u"项目%s -> 批次%s ->PNG_WEB目录不存在" % (project,flowcell))
-    for f in files:
-        if re.match("%s.*chr%s.png" % (sample,chrom), f):
-            filepath = "%s/%s" % (filedir, f)
-    logger.info(filepath)
-    try:
-        data = open(filepath).read()
-        return HttpResponse(data,content_type="image/jpeg")
-    except Exception,e:
-        return HttpResponse("Error")
+    if format == 'png':
+        filedir = "%s/%s/%s/SAMPLE-PNG/" % (XromateConfig.png_dir, project, flowcell)
+        try:
+            files = os.listdir(filedir)
+        except Exception,e:
+            #logger.info(filedir)
+            return HttpResponse(u"项目%s -> 批次%s ->PNG_WEB目录不存在" % (project,flowcell))
+        for f in files:
+            if re.match("%s.*chr%s.png" % (sample,chrom), f):
+                filepath = "%s/%s" % (filedir, f)
+        #logger.info(filepath)
+        try:
+            data = open(filepath).read()
+            return HttpResponse(data,content_type="image/jpeg")
+        except Exception,e:
+            return HttpResponse("Error")
+
+def project_flowcell_sample_cnv_retrieve(request, project, flowcell, sample, cnv):
+    return HttpResponse("返回结果")

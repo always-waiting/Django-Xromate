@@ -1,0 +1,77 @@
+{%load xromate%}
+<table class="ui cnvs compact celled definition table" data-chromosome='{{chrom}}'>
+  <thead class="full-width">
+    <tr>
+      <th class="center aligned">Select</th>
+      <th>Location</th>
+      <th>Blocks</th>
+      <th>Copy</th>
+      <th>Log2</th>
+      <th>Z-value</th>
+      <th>Process</th>
+      <th>Result</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%for cnv in cnvs%}
+    <tr class='popup' >
+      <td class='collapsing'>
+        <div class='ui checkbox fitted toggle'>
+          <input type='checkbox' tabindex='0' class='hidden'>
+          <label></label>
+        </div>
+      </td>
+      <td>
+
+        <a href={%url 'xromate_project_flowcell_sample_cnv_retrieve' project=project flowcell=flowcell sample=sample cnv=cnv|cnvlocation%}>
+          <label class="ui {{cnv|source2color}} label">{{cnv.source|default:"imported"}}</label>
+          {{cnv|cnvlocation}}
+        </a>
+      </td>
+      <td>{{cnv|blockinfo}}</td>
+      <td>{{cnv.copy}}</td>
+      <td>{{cnv.log2}}</td>
+      <td>Z-VALUE??</td>
+      <td class='{{cnv|cnvprocess2class}}'>{{cnv|cnvprocess2zhcn}}</td>
+      <td>{{cnv|cnvresult2zhcn}}</td>
+      <td class='collapsing'>
+        <div class='ui disabled mini icon button'>
+          <i class='popup delete icon'></i>
+          <!--tag i => (class => 'popup delete icon', data => { content => '删除CNV' })-->
+        </div>
+        {% if cnv.source == 'merged'%}
+        <div class='ui disabled mini icon button'>
+          <i class='popup expand icon'></i>
+          <!--tag i => (class => 'popup expand icon', data => { content => '解除合并' })-->
+        </div>
+        {%endif%}
+      </td>
+    </tr>
+    {%endfor%}
+  </tbody>
+  <tfoot class="full-width">
+    <tr>
+      <th>
+        <div class="ui select all small yellow icon button">
+          <i class="options icon"></i>
+        </div>
+      </th>
+      <th colspan="8">
+        <div class="ui create cnv right floated small primary labeled icon button">
+          <i class="add icon"></i>Create CNV
+        </div>
+        <div class="ui delete cnv disabled small labeled icon button">
+          <i class="delete icon"></i>Delete CNV
+        </div>
+        <div class="ui merge cnv disabled small labeled icon button">
+          <i class="compress icon"></i>Merge CNVs
+        </div>
+      </th>
+    </tr>
+    <tr>
+      <th>嵌合</th>
+      <th colspan="8" class="mosaic actions"></th>
+    </tr>
+  </tfoot>
+</table>

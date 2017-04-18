@@ -15,6 +15,36 @@ tz = pytz.timezone('Asia/Shanghai')
 def to_json(data):
     return json_util.dumps(data)
 
+@register.filter
+def source2color(data):
+    source2color = {'imported': '', 'created': 'orange', 'merged': 'red'}
+    return source2color[data.get('source','imported')]
+
+@register.filter
+def cnvprocess2class(data):
+    process2class = {'submitted': '', 'unsubmitted': 'warning', 'confirmed': 'positive'};
+    return process2class[data.get('process','unsubmitted')]
+
+@register.filter
+def cnvprocess2zhcn(data):
+    process2zhcn = {'submitted': '已提交', 'unsubmitted': '未分析', 'confirmed': '已审核'};
+    return process2zhcn[data.get('process', 'unsubmitted')]
+
+@register.filter
+def cnvresult2zhcn(data):
+    result2zhcn = {
+        'normal': '正常', 'polymorphism': '多态', 'unknown': '未知', 'exception': '异常',
+        'mosaic': '嵌合', 'monosome': '单体', 'trisome': '三体', 'tetrasome': '四体','':''
+    };
+    return result2zhcn[data.get('result','')]
+
+@register.filter
+def blockinfo(data):
+    return "%s-%s" % (data['blockStart'], data['blockEnd'])
+
+@register.filter
+def cnvlocation(data):
+    return "chr%s:%s-%s" % (data['chr'], data['start'], data['end'])
 
 @register.filter
 def get_item(data, key):
