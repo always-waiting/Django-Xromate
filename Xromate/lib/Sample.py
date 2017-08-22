@@ -24,6 +24,7 @@ class Samples(mongoe.Document):
     gender_choices = ['male', 'female']
     gender = mongoe.StringField(choices=gender_choices)
     summary = mongoe.DictField()
+    trisomescore = mongoe.DictField()
     result = mongoe.StringField()
     rejection = mongoe.StringField()
     auditor = mongoe.StringField()

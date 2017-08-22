@@ -1,0 +1,45 @@
+% use List::Util qw(pairmap);
+% if (not $self->req->headers->header('X-Requested-With')) { layout 'visible_sidebar', title 'CNVs' }
+
+% my $cnvs = stash 'cnvs';
+% my $cnvs_count = scalar @$cnvs;
+% my $mosaic = stash 'mosaic';
+% my $image = stash 'image';
+% my $chr = param 'chromosome';
+
+% my %process2zhcn = (submitted => '已提交/未审核', unsubmitted => '待分析', confirmed => '已审核', 'rejected' => '已提交/被拒绝');
+% my %process2class = (submitted => 'orange', unsubmitted => 'red', confirmed => 'teal');
+% my %mosaic2zhcn = (normal => '正常', mosaic => '嵌合', monosome => '单体', trisome => '三体', tetrasome => '四体');
+% my %mosaic2color = (normal => '', mosaic => 'teal', monosome => 'green', trisome => 'blue', tetrasome => 'purple');
+
+% stash mosaic2zhcn => \%mosaic2zhcn;
+<div class="ui grid">
+  <div class="three wide column">
+  <div class="fluid ui sticky vertical menu" id="chromosomes">
+    %=include 'cnv/sidemenu'
+  </div>
+  </div>
+  <div class="thirteen wide column">
+
+
+% my %attrs = (class => 'ui chromosome segment', data => {chromosome => $chr});
+% $attrs{data}->{mosaic} = Mojo::JSON::to_json($mosaic->to_hash) if $mosaic;
+% $attrs{data}->{cnvs} = Mojo::JSON::to_json([map { $_->to_hash } @$cnvs]) if $cnvs;
+%=tag div => %attrs => begin
+%=  include 'semantic/elements/header', header => { level => 'h2', content => "Chromosome $chr", color => 'red', sub_header => '' }
+%=  h4 '.ui.teal.horizontal.header.clearing.divider' => 'Chromosome Image'
+%=  tag img => (class => 'ui centered image') => (src => $image)
+%=  h4 '.ui.teal.horizontal.header.clearing.divider' => 'CNV List'
+%=  include 'cnv/table', cnvs => $cnvs, chr => $chr
+%=end
+<script>
+  $(document).ready(function(){
+      $('#chromosomes')
+      .sticky({
+        context: '.main.container',
+        offset: 50
+      });
+  });
+</script>
+</div>
+</div>

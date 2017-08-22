@@ -40,7 +40,7 @@ class Remotes(mongoe.Document):
     chromtype = mongoe.StringField()
     chromtypetext = mongoe.StringField()
     karyomemo = mongoe.StringField()
-
+    fetation = mongoe.StringField()
     # Prenatal Diagnosis
     pregweek = mongoe.StringField()
     pregday = mongoe.StringField()

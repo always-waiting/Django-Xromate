@@ -1,0 +1,83 @@
+% use List::Util qw(pairs);
+% layout 'visible_sidebar';
+% title 'Projects';
+% my %gender2zhcn = (male => '男', female => '女', unknown => '');
+% $sample->summary({}) unless $sample->summary;
+% $self->stash('sampledoc' => $sample);
+<div class="ui grid">
+  <div class="three wide column">
+    <div class="ui fluid sticky vertical menu" id="chromosomes">
+      %=include 'cnv/sidemenu'
+    </div>
+  </div>
+  <div class="thirteen wide column">
+
+
+<h2 class="ui dividing header">报告提交</h2>
+%=include 'sample/form-report'
+<!--<div class='ui right dividing rail'>
+  <div class='ui sticky segment'>
+    %=include 'sample/sample_basic_information'
+  </div>
+</div>-->
+% sub between {
+%   my ($cnv_rejects, $pre, $current) = @_;
+%   return  grep { $_->time < $current and $_->time > $pre  }@$cnv_rejects;
+% }
+
+% use POSIX qw/strftime/;
+<div class="ui hidden divider"></div>
+<h2 class="ui dividing header">驳回记录</h2>
+<table class='ui celled structured teal table'>
+  <thead>
+    <tr>
+      <th class='center aligned'>Time</th>
+      <th class='center aligned' colspan='2'>Rejected CNVs</th>
+      <th class='center aligned'>Rejected reason</th>
+      <th class='center aligned'>Auditor</th>
+    </tr>
+  </thead>
+  <tbody>
+    % for(my $i=0; $i<@$sample_rejects; $i++){
+    %   my $sample_log = $sample_rejects->[$i];
+    %   my ( $pre, $current );
+    %   if ($i==0){
+    %     $pre = 0;
+    %     $current = $sample_rejects->[$i]->time;
+    %   }else{
+    %     $pre = $sample_rejects->[$i-1]->time;
+    %     $current = $sample_rejects->[$i]->time;
+    %   }
+    %   my @cnv_logs = between($cnv_rejects, $pre, $current);
+    %   my $rows_count = @cnv_logs + 1;
+        <tr>
+          <td rowspan="<%= $rows_count %>"> <%= strftime "%Y-%m-%d %H:%M:%S", localtime($sample_log->time) %> </td>
+          <td class='center aligned'><h5>CNV位置</h5></td>
+          <td class='center aligned'><h5>CNV驳回原因</h5></td>
+          <td rowspan="<%= $rows_count %>"> <%= $sample_log->comment %> </td>
+          <td rowspan="<%= $rows_count %>"> <%= $sample_log->user %> </td>
+        </tr>
+        % if(@cnv_logs){
+        %   for(@cnv_logs){
+              <tr>
+                <td><%= $_->location %> </td>
+                <td><%= $_->comment %></td>
+              </tr>
+        %   }
+        % }
+    % }
+  </tbody>
+</table>
+%=include 'sample/sample_basic_information'
+%=include 'sample/remote_report'
+<script>
+  $(document).ready(function(){
+      $('#chromosomes')
+      .sticky({
+        context: '.main.container',
+        offset: 50
+      });
+  });
+</script>
+  </div>
+</div>
